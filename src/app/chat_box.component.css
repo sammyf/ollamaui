@@ -1,0 +1,44 @@
+
+div.output {
+  margin-top: 10px;
+  width:100%;
+  border-radius: 10px;
+  border: #1e2310 1px;
+}
+
+.assistant {
+  background-color: darkolivegreen;
+  margin-right:3px;
+}
+
+.user {
+  background-color: #207960;
+  margin-left:3px;
+}
+
+.system {
+  display: none;
+}
+
+pre.output {
+  min-width:580px;
+  max-width:580px;
+  height:auto;
+  margin-left:10px;
+  margin-right:10px;
+  padding-left: 3px;
+  padding-right: 3px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  white-space: pre-wrap; /* Since CSS 2.1 */
+  word-wrap: break-word; /* For IE 5.5+ and IE 6 */
+  word-break: break-all;
+  word-break: break-word;
+  -moz-hyphens: auto; /* For Mozilla */
+  -webkit-hyphens: auto; /* For Webkit */
+  hyphens: auto;
+}
+

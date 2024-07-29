@@ -1,0 +1,19 @@
+<select class="models">
+  @for ( model of model_array; track model.digest) {
+      <option [value]="model.name">{{model.name}} ({{model.details.parameter_size}} / {{model.details.quantization_level}})</option>
+  }
+</select>
+<div class="outputbox" id="history" onChange="ScrollDown()" #scrollContainer>
+  @for ( msg of chat_history; track msg.index) {
+    <chat_box  [role]="msg.role" [content]="msg.content"></chat_box>
+  }
+</div>
+<div class="input_container">
+  <input type="text" class="input_box" id="user_input" (keyup)="KeyUp($event)" [(ngModel)]="user_input">
+</div>
+<script language="JavaScript">
+  function ScrollDown() {
+    const container = document.getElementById('#history');
+    container.scrollTop = container.scrollHeight - container.clientHeight;
+  }
+</script>

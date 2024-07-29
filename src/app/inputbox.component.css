@@ -1,0 +1,43 @@
+#user_input {
+  background-color: darkcyan;
+  color: white;
+  font-weight: bolder;
+  width:100%;
+  border: 3px solid lightgray;
+  border-radius: 15px;
+  font-family: "Hack Nerd Font Propo";
+}
+
+div.input_container {
+  width:600px;
+  margin-left:auto;
+  margin-right:auto;
+  position: relative;
+  top: 15px;
+}
+
+div.outputbox {
+  width:600px;
+  height: 600px;
+  scroll-behavior: smooth;
+  overflow-scrolling: auto;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: left;
+  border: black solid 1px;
+  background-color: cadetblue;
+  color: white;
+  font-weight: bold;
+  font-family: "Hack Nerd Font Propo";
+  padding: 10px;
+  overflow-y: auto
+}
+
+select.models {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  background-color: #a1615f;
+  color: white;
+  font-weight: bolder;
+}
