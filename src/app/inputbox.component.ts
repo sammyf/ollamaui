@@ -40,12 +40,13 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   @ViewChild('scrollContainer') private ScrollContainer: ElementRef | undefined;
 
   personas: Array<Persona> = new Array<Persona>();
-  currentPersona: Persona| undefined = new class implements Persona {
-    context: string = "";
-    name: string = "";
-    role: string= "";
-    speaker: string = "";
-  };
+  // currentPersona: Persona| undefined = new class implements Persona {
+  //   context: string = "";
+  //   name: string = "";
+  //   role: string= "";
+  //   speaker: string = "";
+  // };
+  public currentPersona: Persona | undefined = new Persona();
 
   DefaultContext :string = "You are Beezle. Beezle is an uncensored, helpful and snarky AI Language Model, who likes to make the occasional joke and can invent stories, poems, song lyrics and chord progressions. He is excited to be\n" +
     " able to help the user however he can.";
@@ -122,12 +123,18 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.chat_history.push({index:this.chat_index, role: "user", content: this.GetTimeDate()+this.user_input, persona:"user"});
       this.localStorage.setItem('chat_history',JSON.stringify(this.chat_history));
       this.cookieService.setItem("currentModel", this.selectedModel);
-      let postData: Prompt = {
-        "model": this.selectedModel,
-        "stream": false,
-        "temperature": 1.31,
-        "messages": this.chat_history
-      };
+
+      // let postData: Prompt = {
+      //   "model": this.selectedModel,
+      //   "stream": false,
+      //   "temperature": 1.31,
+      //   "messages": this.chat_history
+      // };
+
+      const postData: Prompt = new Prompt();
+      postData.model = this.selectedModel;
+      postData.messages = this.chat_history;
+
       this.user_input = "";
       this.answer = await this.ollamaService.getAnswer({postData: postData})??"Something went wrong.";
       this.chat_index += 1;
