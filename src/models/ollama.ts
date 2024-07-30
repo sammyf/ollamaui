@@ -15,6 +15,7 @@ export interface Messages {
   index: number
   role: string;
   content: string;
+  persona: string | 'Diem';
 }
 
 export interface Prompt {
@@ -53,4 +54,11 @@ export interface ModelRedux {
 
 export interface Answer {
   postData: Prompt;
+}
+
+export interface Persona {
+  name: string;
+  context: string;
+  speaker: string;
+  role: string;
 }

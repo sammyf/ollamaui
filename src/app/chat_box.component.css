@@ -1,5 +1,6 @@
 
 div.output {
+  min-height: 110px;
   margin-top: 10px;
   width:100%;
   border-radius: 10px;
@@ -9,11 +10,13 @@ div.output {
 .assistant {
   background-color: darkolivegreen;
   margin-right:3px;
+  text-align: left;
 }
 
 .user {
   background-color: #207960;
   margin-left:3px;
+  text-align: right;
 }
 
 .system {
@@ -21,8 +24,8 @@ div.output {
 }
 
 pre.output {
-  min-width:580px;
-  max-width:580px;
+  min-width:350px;
+  max-width:100%;
   height:auto;
   margin-left:10px;
   margin-right:10px;
@@ -42,3 +45,18 @@ pre.output {
   hyphens: auto;
 }
 
+img.portrait {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  padding: 5px 3px 5px 3px;
+}
+
+img.assistant {
+  float: left;
+}
+
+img.user {
+  float: right;
+}

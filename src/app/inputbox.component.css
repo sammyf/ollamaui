@@ -1,3 +1,7 @@
+@font-face {
+  font-family: 'HACK';
+  src: url('../assets/fonts/HackNerdFontPropo-Regular.ttf');
+}
 #user_input {
   background-color: darkcyan;
   color: white;
@@ -5,7 +9,8 @@
   width:100%;
   border: 3px solid lightgray;
   border-radius: 15px;
-  font-family: "Hack Nerd Font Propo";
+  font-family: HACK;
+  padding: 7px;
 }
 
 div.input_container {
@@ -17,8 +22,10 @@ div.input_container {
 }
 
 div.outputbox {
-  width:600px;
-  height: 600px;
+  width:780px;
+  max-width:780px;
+  margin-top: 30px;
+  height: 800px;
   scroll-behavior: smooth;
   overflow-scrolling: auto;
   margin-left: auto;
@@ -28,8 +35,8 @@ div.outputbox {
   background-color: cadetblue;
   color: white;
   font-weight: bold;
-  font-family: "Hack Nerd Font Propo";
-  padding: 10px;
+  font-family: HACK;
+  padding: 30px;
   overflow-y: auto
 }
 
@@ -41,3 +48,20 @@ select.models {
   color: white;
   font-weight: bolder;
 }
+
+select.personas {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: #5f88a1;
+  color: white;
+  font-weight: bolder;
+}
+
+img.spinner {
+  height:10px;
+  width:790px;
+  border-radius: 5px 5px 5px 5px;
+  padding-top:5px;
+}
+

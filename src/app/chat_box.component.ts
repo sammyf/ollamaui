@@ -13,5 +13,6 @@ import {CommonModule} from '@angular/common';
 export class ChatBoxComponent {
   @Input() content!: string;
   @Input() role!: string;
+  @Input() persona!: string;
 }
 
