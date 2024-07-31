@@ -11,19 +11,20 @@ export interface LLMAnswer {
   eval_count:number;
   eval_duration:number;
 }
-export interface Messages {
-  index: number
-  role: string;
-  content: string;
-  persona: string | 'Diem';
-}
 
-export interface Prompt {
-  model:string;
-  stream:boolean;
-  temperature:number;
-  messages:Array<Messages>;
-}
+// export interface Messages {
+//   index: number;
+//   role: string;
+//   content: string;
+//   persona: string | 'Diem';
+// }
+
+// export interface Prompt {
+//   model: string;
+//   stream: boolean;
+//   temperature: number;
+//   messages: Array<Messages>;
+// }
 
 export interface ModelDetails  {
   format:string;
@@ -56,9 +57,51 @@ export interface Answer {
   postData: Prompt;
 }
 
-export interface Persona {
-  name: string;
-  context: string;
-  speaker: string;
-  role: string;
+// export interface Persona {
+//   name: string;
+//   context: string;
+//   speaker: string;
+//   role: string;
+// }
+
+export class Messages {
+  constructor(
+    public index: number,
+    public role: string,
+    public content: string,
+    public persona: string = 'Diem'
+  ) {
+    this.index = index;
+    this.role = role;
+    this.content = content;
+    this.persona = persona;
+  }
+}
+
+export class Persona {
+  constructor(
+    public name: string = '',
+    public context: string = '',
+    public speaker: string = '',
+    public role: string = ''
+  ) {
+    this.name = name;
+    this.context = context;
+    this.speaker = speaker;
+    this.role = role;
+  }
+}
+
+export class Prompt {
+  constructor(
+    public model: string = 'llama3.1',
+    public stream: boolean = false,
+    public temperature: number = 1.31,
+    public messages: Array<Messages> = new Array<Messages>()
+  ) {
+    this.model = model;
+    this.stream = stream;
+    this.temperature = temperature;
+    this.messages = messages;
+  }
 }
