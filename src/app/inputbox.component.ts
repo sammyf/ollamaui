@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {LLMAnswer, Messages, Prompt, Models, Model, ModelDetails, ModelRedux, Persona} from "../models/ollama";
+import {LLMAnswer, Messages, Prompt, Models, Model, ModelDetails, ModelRedux, Persona} from "../models/ollama.models";
 import {ChatBoxComponent} from "./chat_box.component";
 import {CommonModule} from '@angular/common';
 import {LocalStorageService} from "../services/local-storage.service";
@@ -89,20 +89,18 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   async ngOnInit() {
     this.showSpinner(true);
-    if(this.cookieService.getItem("currentModel") != undefined){
-      this.selectedModel = this.cookieService.getItem("currentModel") ?? "llama3.1";
+    if(this.localStorage.getItem("currentModel") != undefined){
+      this.selectedModel = this.localStorage.getItem("currentModel") ?? "";
     } else {
       this.selectedModel = this.DefaultModel;
     }
 
-    if(this.cookieService.getItem("currentPersona") != undefined) {
-      this.selectedPersona = this.cookieService.getItem("currentPersona") ?? "Beezle";
+    if(this.localStorage.getItem("currentPersona") != undefined) {
+      this.selectedPersona = this.localStorage.getItem("currentPersona") ?? "";
     } else {
       this.selectedPersona = this.DefaultPersona;
     }
-    this.previousSelectedPersona = this.selectedPersona;
-    this.currentPersona = this.personas.find(persona => persona.name === this.selectedPersona);
-    this.system_prompt = this.currentPersona?.context??this.DefaultContext;
+
 
     this.model_array = await this.ollamaService.getModels();
     this.showSpinner(false);
@@ -112,7 +110,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     // console.log(this.user_input)
     if (e.key === 'Enter' && !e.shiftKey) {
       this.showSpinner(true);
-      if(this.selectedPersona !== this.previousSelectedPersona){
+      if(this.previousSelectedPersona === "" || this.previousSelectedPersona === undefined) {
         this.previousSelectedPersona = this.selectedPersona;
         this.SetPersona("");
       } else if(this.selectedPersona !== this.previousSelectedPersona){
@@ -126,10 +124,10 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.chat_index += 1;
       this.chat_history.push({index:this.chat_index, role: "user", content: this.GetTimeDate()+this.user_input, persona:"user"});
       this.localStorage.setItem('chat_history',JSON.stringify(this.chat_history));
-      if((this.selectedPersona === undefined) || (this.selectedPersona === "")) {
+      if((this.selectedModel === undefined) || (this.selectedModel === "")) {
         this.selectedModel = this.model_array[0].name;
       }
-      this.previousSelectedPersona = this.selectedPersona;
+      this.localStorage.setItem("previous_model",this.selectedModel);
       let postData: Prompt = {
         "model": this.selectedModel,
         "stream": false,
@@ -144,6 +142,18 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.localStorage.setItem('chat_history', rs);
       this.showSpinner(false);
     }
+  }
+
+  SetPersona(contextAdd:string ) {
+    this.previousSelectedPersona = this.selectedPersona;
+    this.currentPersona = this.personas.find(persona => persona.name === this.selectedPersona);
+    this.localStorage.setItem("currentPersona", this.selectedPersona);
+    this.SetContext(contextAdd);
+  }
+
+  SetContext(contextAdd:string){
+    this.system_prompt = this.currentPersona?.context??this.DefaultContext;
+    this.chat_history.push({index:this.chat_index, role: "system", content: this.system_prompt, persona: "system"});
   }
 
   GetTimeDate(){
