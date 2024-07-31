@@ -87,13 +87,13 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   async ngOnInit() {
     this.showSpinner(true);
-    if(this.cookieService.getItem("currentModel") != undefined) {
-      this.selectedModel = this.cookieService.getItem("currentModel") ?? "";
+    if(this.localStorage.getItem("currentModel") != undefined) {
+      this.selectedModel = this.localStorage.getItem("currentModel") ?? "";
     } else {
       this.selectedModel = this.DefaultModel;
     }
-    if(this.cookieService.getItem("currentPersona") != undefined) {
-      this.selectedPersona = this.cookieService.getItem("currentPersona") ?? "Beezle";
+    if(this.localStorage.getItem("currentPersona") != undefined) {
+      this.selectedPersona = this.localStorage.getItem("currentPersona") ?? "Beezle";
     } else {
       this.selectedPersona = this.DefaultPersona;
     }
@@ -113,9 +113,8 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
         this.previousSelectedPersona = this.selectedPersona;
         this.currentPersona = this.personas.find(persona => persona.name === this.selectedPersona);
         this.system_prompt = this.currentPersona?.context??this.DefaultContext;
-        this.chat_history = new Array<Messages>();
         this.chat_history.push({index: this.chat_index, role: "system", content: this.system_prompt, persona:"user"});
-        this.cookieService.setItem("currentPersona", this.selectedPersona);
+        this.localStorage.setItem("currentPersona", this.selectedPersona);
       }
       this.chat_index += 1;
       this.chat_history.push({
@@ -128,7 +127,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
         'chat_history',
         JSON.stringify(this.chat_history)
       );
-      this.cookieService.setItem('currentModel', this.selectedModel);
+      this.localStorage.setItem('currentModel', this.selectedModel);
 
       // let postData: Prompt = {
       //   "model": this.selectedModel,
