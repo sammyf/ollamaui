@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {LLMAnswer, Messages, Prompt, Models, Model, ModelDetails, ModelRedux, Persona} from "../models/ollama.models";
+import {LLMAnswer, Messages, Prompt, Models, Model, ModelDetails, ModelRedux, Persona} from "../models/ollama";
 import {ChatBoxComponent} from "./chat_box.component";
 import {CommonModule} from '@angular/common';
 import {LocalStorageService} from "../services/local-storage.service";
@@ -40,13 +40,15 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   @ViewChild('scrollContainer') private ScrollContainer: ElementRef | undefined;
 
   personas: Array<Persona> = new Array<Persona>();
-  // currentPersona: Persona| undefined = new class implements Persona {
-  //   context: string = "";
-  //   name: string = "";
-  //   role: string= "";
-  //   speaker: string = "";
-  // };
-  public currentPersona: Persona | undefined = new Persona();
+  currentPersona: Persona| undefined = new class implements Persona {
+    context: string = "";
+    name: string = "";
+    role: string= "";
+    speaker: string = "";
+  };
+
+  username:string = "";
+  previousUsername:string = "";
 
   DefaultContext :string = "";
   DefaultPersona :string = ""
@@ -87,13 +89,14 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   async ngOnInit() {
     this.showSpinner(true);
-    if(this.localStorage.getItem("currentModel") != undefined) {
-      this.selectedModel = this.localStorage.getItem("currentModel") ?? "";
+    if(this.cookieService.getItem("currentModel") != undefined){
+      this.selectedModel = this.cookieService.getItem("currentModel") ?? "llama3.1";
     } else {
       this.selectedModel = this.DefaultModel;
     }
-    if(this.localStorage.getItem("currentPersona") != undefined) {
-      this.selectedPersona = this.localStorage.getItem("currentPersona") ?? "Beezle";
+
+    if(this.cookieService.getItem("currentPersona") != undefined) {
+      this.selectedPersona = this.cookieService.getItem("currentPersona") ?? "Beezle";
     } else {
       this.selectedPersona = this.DefaultPersona;
     }
@@ -111,39 +114,30 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.showSpinner(true);
       if(this.selectedPersona !== this.previousSelectedPersona){
         this.previousSelectedPersona = this.selectedPersona;
-        this.currentPersona = this.personas.find(persona => persona.name === this.selectedPersona);
-        this.system_prompt = this.currentPersona?.context??this.DefaultContext;
-        this.chat_history.push({index: this.chat_index, role: "system", content: this.system_prompt, persona:"user"});
-        this.localStorage.setItem("currentPersona", this.selectedPersona);
+        this.SetPersona("");
+      } else if(this.selectedPersona !== this.previousSelectedPersona){
+        this.SetPersona(this.previousSelectedPersona+" left the room. "+this.selectedPersona+" enters.");
+        this.previousSelectedPersona = this.selectedPersona;
+        //this.chat_history = new Array<Messages>();
+      } else if( this.username !== undefined && this.username !== undefined && this.username !== this.previousUsername) {
+        this.previousUsername = this.username;
+        this.SetContext("")
       }
       this.chat_index += 1;
-      this.chat_history.push({
-        index: this.chat_index,
-        role: 'user',
-        content: this.GetTimeDate() + this.user_input,
-        persona: 'user',
-      });
-      this.localStorage.setItem(
-        'chat_history',
-        JSON.stringify(this.chat_history)
-      );
-      this.localStorage.setItem('currentModel', this.selectedModel);
-
-      // let postData: Prompt = {
-      //   "model": this.selectedModel,
-      //   "stream": false,
-      //   "temperature": 1.31,
-      //   "messages": this.chat_history
-      // };
-
-      const postData: Prompt = new Prompt();
-      postData.model = this.selectedModel;
-      postData.messages = this.chat_history;
-
-      this.user_input = '';
-      this.answer =
-        (await this.ollamaService.getAnswer({ postData: postData })) ??
-        'Something went wrong.';
+      this.chat_history.push({index:this.chat_index, role: "user", content: this.GetTimeDate()+this.user_input, persona:"user"});
+      this.localStorage.setItem('chat_history',JSON.stringify(this.chat_history));
+      if((this.selectedPersona === undefined) || (this.selectedPersona === "")) {
+        this.selectedModel = this.model_array[0].name;
+      }
+      this.previousSelectedPersona = this.selectedPersona;
+      let postData: Prompt = {
+        "model": this.selectedModel,
+        "stream": false,
+        "temperature": 1.31,
+        "messages": this.chat_history
+      };
+      this.user_input = "";
+      this.answer = await this.ollamaService.getAnswer({postData: postData})??"Something went wrong.";
       this.chat_index += 1;
       this.chat_history.push({index:this.chat_index, role: "assistant", content: this.answer, persona: this.selectedPersona});
       let rs = JSON.stringify(this.reverseTruncateHistory(4000))
@@ -172,17 +166,9 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     let revHist = [...this.chat_history].reverse();
 
     // Using a 'for' loop
-    // for (let i = 0; i < revHist.length; i++) {
-    //   rs.push(revHist[i]);
-    //   cnt += revHist[i].content.length + revHist[i].role.length + buffer;
-    //   if (cnt >= size) {
-    //     break; // Early termination of the loop
-    //   }
-    // }
-
-    for (const message of revHist) {
-      rs.push(message);
-      cnt += message.content.length + message.role.length + buffer;
+    for(let i = 0; i < revHist.length; i++) {
+      rs.push(revHist[i]);
+      cnt += revHist[i].content.length + revHist[i].role.length + buffer;
       if (cnt >= size) {
         break; // Early termination of the loop
       }
@@ -193,11 +179,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   ScrollToBottom() {
     // @ts-ignore
-    this.renderer.setProperty(
-      this.ScrollContainer?.nativeElement,
-      'scrollTop',
-      this.ScrollContainer?.nativeElement.scrollHeight
-    );
+    this.renderer.setProperty(this.ScrollContainer.nativeElement, 'scrollTop', this.ScrollContainer.nativeElement.scrollHeight);
   }
 
   ngAfterViewChecked() {
