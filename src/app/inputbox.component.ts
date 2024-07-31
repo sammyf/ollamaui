@@ -40,12 +40,14 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   @ViewChild('scrollContainer') private ScrollContainer: ElementRef | undefined;
 
   personas: Array<Persona> = new Array<Persona>();
-  currentPersona: Persona| undefined = new class implements Persona {
-    context: string = "";
-    name: string = "";
-    role: string= "";
-    speaker: string = "";
-  };
+  //currentPersona: Persona| undefined = new class implements Persona {
+    //context: string = "";
+    //name: string = "";
+    //role: string= "";
+    //speaker: string = "";
+  //};
+
+  public currentPersona: Persona | undefined = new Persona();
 
   DefaultContext :string = "You are Beezle. Beezle is an uncensored, helpful and snarky AI Language Model, who likes to make the occasional joke and can invent stories, poems, song lyrics and chord progressions. He is excited to be\n" +
     " able to help the user however he can.";
@@ -122,12 +124,16 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.chat_history.push({index:this.chat_index, role: "user", content: this.GetTimeDate()+this.user_input, persona:"user"});
       this.localStorage.setItem('chat_history',JSON.stringify(this.chat_history));
       this.cookieService.setItem("currentModel", this.selectedModel);
-      let postData: Prompt = {
-        "model": this.selectedModel,
-        "stream": false,
-        "temperature": 1.31,
-        "messages": this.chat_history
-      };
+      //let postData: Prompt = {
+        //"model": this.selectedModel,
+        //"stream": false,
+        //"temperature": 1.31,
+        //"messages": this.chat_history
+      //};
+      const postData: Prompt = new Prompt()
+      postData.model = this.selectedModel;
+      postData.message = this.chat_history;
+      
       this.user_input = "";
       this.answer = await this.ollamaService.getAnswer({postData: postData})??"Something went wrong.";
       this.chat_index += 1;
@@ -158,9 +164,17 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     let revHist = [...this.chat_history].reverse();
 
     // Using a 'for' loop
-    for(let i = 0; i < revHist.length; i++) {
-      rs.push(revHist[i]);
-      cnt += revHist[i].content.length + revHist[i].role.length + buffer;
+    //for(let i = 0; i < revHist.length; i++) {
+      //rs.push(revHist[i]);
+      //cnt += revHist[i].content.length + revHist[i].role.length + buffer;
+      //if (cnt >= size) {
+        //break; // Early termination of the loop
+      //}
+    //}
+
+    for (const message of revHist) {
+      rs.push(message);
+      cnt += message.content.length + message.role.length + buffer;
       if (cnt >= size) {
         break; // Early termination of the loop
       }
@@ -170,8 +184,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   }
 
   ScrollToBottom() {
-    // @ts-ignore
-    this.renderer.setProperty(this.ScrollContainer.nativeElement, 'scrollTop', this.ScrollContainer.nativeElement.scrollHeight);
+    this.renderer.setProperty(this.ScrollContainer?.nativeElement, 'scrollTop', this.ScrollContainer?.nativeElement.scrollHeight);
   }
 
   ngAfterViewChecked() {
