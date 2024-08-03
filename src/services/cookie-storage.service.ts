@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import {JsonParseOptions} from "nx/src/utils/json";
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CookieStorageService {
-  DomainName: string = "beezle.cosmic-bandito.com"
+  DomainName: string = environment.serverUrl.replace(/^https?:\/\//, '');
 
   constructor() {
   }

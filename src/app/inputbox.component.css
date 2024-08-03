@@ -2,28 +2,38 @@
   font-family: 'HACK';
   src: url('../assets/fonts/HackNerdFontPropo-Regular.ttf');
 }
-#user_input {
-  background-color: darkcyan;
+select.models {
+  position: fixed;
+  top: 5px;
+  left: 5px;
+  max-width: 30%;
+  background-color: #a1615f;
   color: white;
   font-weight: bolder;
-  width:100%;
-  border: 3px solid lightgray;
-  border-radius: 15px;
-  font-family: HACK;
-  padding: 7px;
 }
 
-div.input_container {
-  width:600px;
-  margin-left:auto;
-  margin-right:auto;
-  position: relative;
-  top: 15px;
+select.personas {
+  position: fixed;
+  top: 5px;
+  right: 5px;
+  max-width: 30%;
+  background-color: #5f88a1;
+  color: white;
+  font-weight: bolder;
 }
+
+#container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 30px);
+}
+
 
 div.outputbox {
-  width:780px;
-  max-width:780px;
+  width:90%;
+  /* max-width:780px; */
   margin-top: 30px;
   height: 800px;
   scroll-behavior: smooth;
@@ -40,28 +50,58 @@ div.outputbox {
   overflow-y: auto
 }
 
-select.models {
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  background-color: #a1615f;
-  color: white;
-  font-weight: bolder;
-}
-
-select.personas {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background-color: #5f88a1;
-  color: white;
-  font-weight: bolder;
-}
-
 img.spinner {
   height:10px;
-  width:790px;
+  width:100%;
   border-radius: 5px 5px 5px 5px;
   padding-top:5px;
 }
 
+div.input_container {
+  clear: both;
+  display: block;
+  width:90%;
+  padding-top: 5px;
+  text-align: center;
+}
+
+#user_input {
+  background-color: darkcyan;
+  color: white;
+  font-weight: bolder;
+  width:100%;
+  border: 3px solid lightgray;
+  border-radius: 15px;
+  font-family: HACK;
+  padding: 7px;
+}
+
+#clear_username {
+  background-color: darkcyan;
+  color: white;
+  font-weight: bolder;
+  font-family: HACK;
+  width:150px;
+  padding: 3px;
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 3px;
+  border-radius: 15px;
+}
+
+#uname_container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width:500px;
+  height:150px;
+  transform: translate(-50%, -50%);
+}
+
+#ttsPlayer {
+  position:relative;
+  width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}

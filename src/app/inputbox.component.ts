@@ -4,7 +4,7 @@ import {
   Injectable,
   ElementRef,
   Renderer2,
-  AfterViewChecked, OnInit, Input, Output,
+  AfterViewChecked, OnInit, Input, Output, ChangeDetectorRef,
 } from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
@@ -15,15 +15,23 @@ import {LocalStorageService} from "../services/local-storage.service";
 import {OllamaService} from "../services/ollama.service";
 import {PersonasService} from "../services/personas.service";
 import {CookieStorageService} from "../services/cookie-storage.service";
+import {UtilsService} from "../services/utils.service";
+import {UsernamePopupComponent} from "./username-popup/username-popup.component";
+import {TtsService} from "../services/tts.service";
+import {DomSanitizer, SafeHtml, SafeResourceUrl} from '@angular/platform-browser';
+import {runPostSignalSetFn} from "@angular/core/primitives/signals";
+import {Event} from "@angular/router";
+import {SanitizeHtmlPipe} from "../pipes/sanitize-html.pipe";
+import { environment } from '../environments/environment';
+// Highlighter
+import hljs from 'highlight.js';
 
 /* TODO :
-  * add a text box for the user to enter their name and gender.
   * permanent memory
-  * shared memory across personaties
   * call to the TTS server
   * call to the internet/searx Engine
+  * tests
  */
-
 
 @Injectable({providedIn: 'root'})
 @Component({
@@ -31,14 +39,20 @@ import {CookieStorageService} from "../services/cookie-storage.service";
   templateUrl: './inputbox.component.html',
   styleUrls: ['./inputbox.component.css'],
   standalone: true,
-  imports: [ChatBoxComponent, FormsModule, CommonModule]
+  imports: [ChatBoxComponent, FormsModule, CommonModule, UsernamePopupComponent, SanitizeHtmlPipe],
 })
 
 export class InputBoxComponent implements AfterViewChecked, OnInit {
-  url = 'https://beezle.cosmic-bandito.com/api';
+
+  url = `${environment.serverUrl}/api`;
   @ViewChild(ChatBoxComponent) ChatBoxReference: ChatBoxComponent | undefined;
   @ViewChild('scrollContainer') private ScrollContainer: ElementRef | undefined;
+  @ViewChild('TTSPlayer') audioPlayer: ElementRef | undefined;
 
+  // @ts-ignore
+  safeUrl: SafeResourceUrl;
+  // @ts-ignore
+  safeHtml: SafeHtml;
   personas: Array<Persona> = new Array<Persona>();
   currentPersona: Persona| undefined = new class implements Persona {
     context: string = "";
@@ -48,7 +62,10 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   };
 
   username:string = "";
+  showUsernamePopup = false;
   previousUsername:string = "";
+
+  ttsClip: string = "";
 
   DefaultContext :string = "";
   DefaultPersona :string = ""
@@ -56,7 +73,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   selectedModel:string = this.DefaultModel;
   selectedPersona:string = this.DefaultModel;
-  spinnerState:string = "block"
+  spinnerState:boolean = true;
 
   previousSelectedPersona:string = "";
   answer = "";
@@ -72,9 +89,20 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
               private formsModule: FormsModule,
               private ollamaService: OllamaService,
               private personasService: PersonasService,
-              private cookieService: CookieStorageService) {
+              private cookieService: CookieStorageService,
+              private utilService: UtilsService,
+              private ttsService: TtsService,
+              private sanitizer: DomSanitizer,
+              private cdRef: ChangeDetectorRef
+  ) {
     this.chat_history = JSON.parse(<string>localStorage.getItem('chat_history')) ?? new Array<Messages>();
-    this.personas = personasService.getAllPersonas();
+    this.personas = personasService.getAllPersonas().sort((a:Persona, b:Persona) => {
+      let al= a.name.toLowerCase();
+      let bl = b.name.toLowerCase();
+      if (al < bl) return -1;
+      if (al > bl) return 1;
+      return 0;
+    });
     if( this.chat_history.length > 0) {
       this.chat_index = this.chat_history[this.chat_history.length - 1].index;
     }
@@ -84,50 +112,61 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   model_array: Array<Model> = new Array<Model>();
 
   private showSpinner(onoff:boolean) {
-    this.spinnerState = onoff ? "block" : "none";
+    this.spinnerState = onoff;
   }
 
   async ngOnInit() {
     this.showSpinner(true);
-    if(this.localStorage.getItem("currentModel") != undefined){
+    if( (this.localStorage.getItem("currentModel") !== undefined) && (this.localStorage.getItem("currentModel") !== "")) {
       this.selectedModel = this.localStorage.getItem("currentModel") ?? "";
     } else {
       this.selectedModel = this.DefaultModel;
     }
 
-    if(this.localStorage.getItem("currentPersona") != undefined) {
+    if(this.localStorage.getItem("currentPersona") !== undefined) {
       this.selectedPersona = this.localStorage.getItem("currentPersona") ?? "";
     } else {
       this.selectedPersona = this.DefaultPersona;
     }
-
-
     this.model_array = await this.ollamaService.getModels();
+    // @ts-ignore
+    this.model_array = [...this.model_array].sort((a, b) => {
+      let al= a.name.toLowerCase();
+      let bl = b.name.toLowerCase();
+      if (al < bl) return -1;
+      if (al > bl) return 1;
+      return 0;
+    });
     this.showSpinner(false);
+
+
+    // @ts-ignore
+    this.audioPlayer.nativeElement.volume = parseFloat(this.localStorage.getItem("volume"));
   }
 
   async KeyUp(e: KeyboardEvent) {
     // console.log(this.user_input)
     if (e.key === 'Enter' && !e.shiftKey) {
       this.showSpinner(true);
+      this.username = this.utilService.GetUsername();
       if(this.previousSelectedPersona === "" || this.previousSelectedPersona === undefined) {
         this.previousSelectedPersona = this.selectedPersona;
         this.SetPersona("");
       } else if(this.selectedPersona !== this.previousSelectedPersona){
-        this.SetPersona(this.previousSelectedPersona+" left the room. "+this.selectedPersona+" enters.");
+        this.SetPersona(`** BEEP ** Personality switch happening! ${this.previousSelectedPersona} disappears in a digital puff of magical bytes. YOU are ${this.selectedPersona}, and at your place used to be ${this.previousSelectedPersona}. I, on the other hand, am ${this.username}!  *** BEEP *** `);
         this.previousSelectedPersona = this.selectedPersona;
         //this.chat_history = new Array<Messages>();
-      } else if( this.username !== undefined && this.username !== undefined && this.username !== this.previousUsername) {
-        this.previousUsername = this.username;
+      } else if( this.username !== undefined && this.username !== "" && this.username !== this.previousUsername) {
         this.SetContext("")
       }
+      this.previousUsername = this.username;
       this.chat_index += 1;
-      this.chat_history.push({index:this.chat_index, role: "user", content: this.GetTimeDate()+this.user_input, persona:"user"});
+      this.chat_history.push({index:this.chat_index, role: "user", content: this.utilService.GetTimeDate()+this.user_input, persona:"user"});
       this.localStorage.setItem('chat_history',JSON.stringify(this.chat_history));
       if((this.selectedModel === undefined) || (this.selectedModel === "")) {
         this.selectedModel = this.model_array[0].name;
       }
-      this.localStorage.setItem("previous_model",this.selectedModel);
+      this.localStorage.setItem("currentModel",this.selectedModel);
       let postData: Prompt = {
         "model": this.selectedModel,
         "stream": false,
@@ -136,8 +175,17 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       };
       this.user_input = "";
       this.answer = await this.ollamaService.getAnswer({postData: postData})??"Something went wrong.";
+      this.ttsClip = await this.ttsService.getTTS(this.answer, this.currentPersona?.speaker??"p243");
+      this.updateAudioSource();
       this.chat_index += 1;
-      this.chat_history.push({index:this.chat_index, role: "assistant", content: this.answer, persona: this.selectedPersona});
+      // const highlightedCode = hljs.highlightAuto(
+      //   this.answer,
+      // ).value
+      let highlightedCode = this.utilService.DoHighlight(this.answer);
+
+      console.log("1   ",this.safeHtml);
+      console.log("2   ",this.answer);
+      this.chat_history.push({index:this.chat_index, role: "assistant", content:  highlightedCode, persona: this.selectedPersona});
       let rs = JSON.stringify(this.reverseTruncateHistory(4000))
       this.localStorage.setItem('chat_history', rs);
       this.showSpinner(false);
@@ -153,20 +201,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   SetContext(contextAdd:string){
     this.system_prompt = this.currentPersona?.context??this.DefaultContext;
-    this.chat_history.push({index:this.chat_index, role: "system", content: this.system_prompt, persona: "system"});
-  }
-
-  GetTimeDate(){
-    let dateOb = new Date();
-
-    let date = ("0" + dateOb.getDate()).slice(-2);
-    let month = ("0" + (dateOb.getMonth() + 1)).slice(-2);
-    let year = dateOb.getFullYear();
-    let hours = ("0" + dateOb.getHours()).slice(-2);
-    let minutes = ("0" + dateOb.getMinutes()).slice(-2);
-    let seconds = ("0" + dateOb.getSeconds()).slice(-2);
-
-    return "["+year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds+"] ";
+    this.chat_history.push({index:this.chat_index, role: "system", content: this.system_prompt, persona: "user"});
   }
 
   reverseTruncateHistory(size:number):Array<Messages> {
@@ -196,6 +231,23 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     this.ScrollToBottom();
   }
 
+  updateAudioSource(): void {
+    this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.ttsClip);
+    // Manually trigger change detection to ensure the template updates immediately
+    this.cdRef.detectChanges();
+    this.audioPlayer ? this.audioPlayer.nativeElement.load : undefined;
+  }
+
+  SetTTSVolume() {
+    //@ts-ignore
+    this.localStorage.setItem("volume", this.audioPlayer.nativeElement.volume.toString())
+  }
+
+  ClearUsername() {
+    this.showUsernamePopup = true;
+  }
+
   protected readonly parent = parent;
+  protected readonly Event = Event;
 }
 

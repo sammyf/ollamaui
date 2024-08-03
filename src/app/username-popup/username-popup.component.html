@@ -1,4 +1,5 @@
-<div id="popup">
-  <p>Please enter your name.</p>
-  <input type="text" id="username" class="input_box" [value]="username" (keyup)="KeyUp()"  [(ngModel)]="username"/>
+<div id="usernameContainer" *ngIf="showme">
+  <p class="title">Please enter your name :</p>
+  <input type="text" id="username" class="input_box" [value]="username" [(ngModel)]="username"/>
+  <input type="button" id="save_btn" class="input_btn" (click)="StoreName()" value="OK">
 </div>

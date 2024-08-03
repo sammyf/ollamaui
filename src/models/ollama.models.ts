@@ -1,3 +1,6 @@
+import {SafeHtml} from "@angular/platform-browser";
+import {sanitizeIdentifier} from "@angular/compiler";
+
 export interface LLMAnswer {
   model: string;
   created_at: string;

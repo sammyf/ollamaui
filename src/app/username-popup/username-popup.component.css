@@ -1,17 +1,50 @@
-div.popup {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #fff;
-  border: 1px solid #ccc;
-  padding: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+@font-face {
+  font-family: 'HACK';
+  src: url('../../assets/fonts/HackNerdFontPropo-Regular.ttf');
 }
 
 input.input_box {
   background-color: #207960;
   color: #fff;
+  border: none;
+  font-size: xxx-large;
   font-weight: bold;
   font-family:HACK;
+  width:100%;
+}
+
+p.title {
+  font-size: large;
+  font-weight: bold;
+  font-family:HACK;
+}
+
+#save_btn {
+  clear:both;
+  float:right;
+  border: 1px #1e2310;
+  border-radius: 5px;
+  background-color: lightskyblue;
+  color: #207960;
+  font-size: large;
+  font-weight: bold;
+  font-family:HACK;
+  margin-top: 10px;
+  min-width: 40px;
+  min-height: 20px;
+}
+
+#usernameContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width:500px;
+  height:150px;
+  padding: 20px;
+  vertical-align: center;
+  background: white;
+  border: 1px solid lightgray;
+  border-radius: 10px;
+  transform: translate(-50%, -50%);
+  box-shadow: 0px 0px 15px #1e2310 ;
 }
