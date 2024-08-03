@@ -1,10 +1,28 @@
 # Ollamaui
 
+This code comes with no guarantee whatsoever. You'll need to have an ollama server running under the 
+same URL to bypass CORS, and if you use the companion app it will need to use the same URL too.
+
+Just to be clear : this is just something I barfed out to get to speed with Angular18, so much is left 
+to be desired in the way things are done and once I have the skills I need I might just drop the project
+alltogether. So don't expect help running it or me fixing issues you find. If you like it then I really 
+encourage you to fork it and work on it yourself. Coding is a fun activity when it's raining outside.
+
+* The excellent Ollama can found at https://ollama.com/
+* The TTS companion application can be found at https://github.com/sammyf/tts_webapp 
+
+No tests included as of yet. Working on them.
+
+
+Just leaving the automatically generated stuff here, as it might help you out a bit.
+
+____________________________________________________________________________________
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.1.1.
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Run `ng serve` for a dev server. The application will automatically reload if you change any of the source files.
 
 ## Code scaffolding
 
