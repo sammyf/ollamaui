@@ -69,7 +69,7 @@ export class OllamaService {
             responseType: 'json',
             headers: headers
           }
-        )
+        ) .pipe(timeout(600000))
       );
 
       // @ts-ignore
