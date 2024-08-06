@@ -13,6 +13,11 @@ encourage you to fork it and work on it yourself. Coding is a fun activity when 
 
 No tests included as of yet. Working on them.
 
+HOW TO RUN IT :
+npm install 
+ng serve 
+
+---------------------
 
 Just leaving the automatically generated stuff here, as it might help you out a bit.
 
