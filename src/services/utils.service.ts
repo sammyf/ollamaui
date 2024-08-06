@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
 import hljs from "highlight.js";
+import {UrlRequest, UrlResponse} from "../models/tts.models";
+import {TtsService} from "./tts.service";
+
+const MAX_TOKENS: number = 1000;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UtilsService {
 
-  constructor() {
+  constructor(private ttsService: TtsService) {
   }
 
   GetTimeDate():string {
@@ -43,6 +47,37 @@ export class UtilsService {
         originalAnswer = originalAnswer.replace(g, highlighted);
       }
     return originalAnswer;
+  }
+
+  // Internet Connection
+  //
+
+  async ReplaceUrls(source:string):Promise<string> {
+    let urlRegex: RegExp = /(https?:\/\/[^\s]+)/gi; // This is a regular expression that matches URLs.
+    let result: UrlResponse;
+    let urls = Array.from(source.matchAll(urlRegex));
+    console.log("Number of URLs found: ", urls.length);
+    for (let match of urls) {
+      let url = match[1];
+      console.log(`matched URL : =${url}`);
+      let body = await this.ttsService.fetchUrl(url);
+      let result = `<LINKED url="${url}" ReturnCode="${body.returnCode}">${body.content}</LINKED>`;
+      source = source.replace(url, this.TruncateToTokens(result,MAX_TOKENS));
+    };
+    return source; // This fetches the URL data and replaces the original URL with it wrapped in "<LINKED URL>{{FetchUrl(URL)}}</LINKED URL>" format.
+  }
+
+  TruncateToTokens(input: string, maxTokens:number): string {
+    // Split the input based on spaces and punctuation
+    let splitInput = input.split(/[\s.,;:"!?]+/);
+
+    // If the length is more than maxTokens, truncate it
+    if (splitInput.length > maxTokens) {
+      splitInput = splitInput.slice(0, maxTokens);
+    }
+
+    // Join the array back into a string and return it
+    return splitInput.join(' ')+" [...]";
   }
 
   //

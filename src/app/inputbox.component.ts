@@ -21,7 +21,6 @@ import {TtsService} from "../services/tts.service";
 import {DomSanitizer, SafeHtml, SafeResourceUrl} from '@angular/platform-browser';
 import {runPostSignalSetFn} from "@angular/core/primitives/signals";
 import {Event} from "@angular/router";
-import {SanitizeHtmlPipe} from "../pipes/sanitize-html.pipe";
 import { environment } from '../environments/environment';
 // Highlighter
 import hljs from 'highlight.js';
@@ -39,7 +38,7 @@ import hljs from 'highlight.js';
   templateUrl: './inputbox.component.html',
   styleUrls: ['./inputbox.component.css'],
   standalone: true,
-  imports: [ChatBoxComponent, FormsModule, CommonModule, UsernamePopupComponent, SanitizeHtmlPipe],
+  imports: [ChatBoxComponent, FormsModule, CommonModule, UsernamePopupComponent],
 })
 
 export class InputBoxComponent implements AfterViewChecked, OnInit {
@@ -68,10 +67,12 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   ttsClip: string = "";
 
   DefaultContext :string = "";
-  DefaultPersona :string = ""
-  DefaultModel: string = "";
+  DefaultPersona :string = "Beezle"
+  DefaultModel: string = "gemma2:2b";
 
   selectedModel:string = this.DefaultModel;
+  previousModel:string = this.selectedModel;
+
   selectedPersona:string = this.DefaultModel;
   spinnerState:boolean = true;
 
@@ -117,11 +118,17 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   async ngOnInit() {
     this.showSpinner(true);
-    if( (this.localStorage.getItem("currentModel") !== undefined) && (this.localStorage.getItem("currentModel") !== "")) {
-      this.selectedModel = this.localStorage.getItem("currentModel") ?? "";
-    } else {
-      this.selectedModel = this.DefaultModel;
+    let currentModel = await this.ollamaService.GetCurrentModel();
+    if(currentModel === "None") {
+      if ((this.localStorage.getItem("currentModel") !== undefined) && (this.localStorage.getItem("currentModel") !== "")) {
+        this.selectedModel = this.localStorage.getItem("currentModel") ?? "";
+      } else {
+        this.selectedModel = this.DefaultModel;
+      }
+    }  else {
+      this.selectedModel = currentModel;
     }
+    this.previousModel = this.selectedModel;
 
     if(this.localStorage.getItem("currentPersona") !== undefined) {
       this.selectedPersona = this.localStorage.getItem("currentPersona") ?? "";
@@ -161,17 +168,26 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       }
       this.previousUsername = this.username;
       this.chat_index += 1;
-      this.chat_history.push({index:this.chat_index, role: "user", content: this.utilService.GetTimeDate()+this.user_input, persona:"user"});
+      console.log("this user input:"+this.user_input);
+      let expandedUserInput = await this.utilService.ReplaceUrls(this.user_input)
+      console.log("expanded : "+expandedUserInput);
+      this.chat_history.push({index:this.chat_index, role: "user", content: this.utilService.GetTimeDate()+expandedUserInput, persona:"user"});
       this.localStorage.setItem('chat_history',JSON.stringify(this.chat_history));
+
       if((this.selectedModel === undefined) || (this.selectedModel === "")) {
-        this.selectedModel = this.model_array[0].name;
+        this.selectedModel = this.DefaultModel;
+      }
+      if(this.previousModel !== this.previousModel){
+        this.ollamaService.UnloadModel(this.previousModel);
+        this.previousModel = this.selectedModel;
       }
       this.localStorage.setItem("currentModel",this.selectedModel);
       let postData: Prompt = {
         "model": this.selectedModel,
         "stream": false,
         "temperature": 1.31,
-        "messages": this.chat_history
+        "messages": this.chat_history,
+        "keep_alive": -1
       };
       this.user_input = "";
       this.answer = await this.ollamaService.getAnswer({postData: postData})??"Something went wrong.";
@@ -183,8 +199,6 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       // ).value
       let highlightedCode = this.utilService.DoHighlight(this.answer);
 
-      console.log("1   ",this.safeHtml);
-      console.log("2   ",this.answer);
       this.chat_history.push({index:this.chat_index, role: "assistant", content:  highlightedCode, persona: this.selectedPersona});
       let rs = JSON.stringify(this.reverseTruncateHistory(4000))
       this.localStorage.setItem('chat_history', rs);

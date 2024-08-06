@@ -99,11 +99,35 @@ export class Prompt {
     public model: string = 'llama3.1',
     public stream: boolean = false,
     public temperature: number = 1.31,
-    public messages: Array<Messages> = new Array<Messages>()
+    public messages: Array<Messages> = new Array<Messages>(),
+    public keep_alive: number = 0
   ) {
     this.model = model;
     this.stream = stream;
     this.temperature = temperature;
     this.messages = messages;
   }
+}
+
+export class PsModelDetail {
+  parent_model: string = "None";
+  format: string = "None";
+  family: string = "None";
+  families: string[] = [];
+  parameter_size: string = "None";
+  quantization_level: string = "None";
+}
+
+export class PsModel {
+  name: string = "None";
+  model: string = "None";
+  size: number = 0;
+  digest: string = "None";
+  details: PsModelDetail | undefined = undefined;
+  expires_at: string  = "None";
+  size_vram: number = 0;
+}
+
+export class PsModelsData {
+  models: PsModel[] = [];
 }

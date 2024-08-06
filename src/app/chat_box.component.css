@@ -60,3 +60,7 @@ img.assistant {
 img.user {
   float: right;
 }
+
+linked {
+  display: none;
+}

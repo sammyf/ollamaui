@@ -6,3 +6,12 @@ export class TtsRequest {
 export class TtsResponse {
   public url: string = "";
 }
+
+export class UrlRequest {
+  public url: string = "";
+}
+
+export class UrlResponse {
+  public content: string = "";
+  public returnCode: number = 200;
+}
