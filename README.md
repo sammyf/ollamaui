@@ -1,7 +1,13 @@
 # Ollamaui
+
+Yet Again An Ollama UI ... This one is Cloudflare 524 safe, it implements seamless personalities sharing 
+a context, and seamless model swapping. Do you need it? Probably not, but it's fun to write, so sue me ...
+
 ## Here is what it looks like ...
 
 ![screenshot.png](src/assets/images/screenshot.png)
+
+### DISCLAIMER
 
 This code comes with no guarantee whatsoever. You'll need to have an ollama server running under the 
 same URL to bypass CORS, and ~~if you use the companion app~~ the companion app you WILL need to make this work, 
