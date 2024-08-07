@@ -25,6 +25,8 @@ encourage you to fork it and work on it yourself. Coding is a fun activity when 
 * The TTS companion application can be found at https://github.com/sammyf/tts_webapp 
 
 ### HOW TO RUN IT :
+Make sure the Companion App and Celery are running, and that the server URL is set in src/environments!
+
 `npm install`
 
 `ng serve`
