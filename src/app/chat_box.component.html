@@ -1,5 +1,5 @@
 <div class="output {{role}}" >
   <img src="../assets/images/{{persona}}.png" class="portrait {{role}}">
-  <pre class="output {{role}}" *ngIf="(role === 'user') || (role === 'system'); else elseBlock">{{content}}</pre>
+  <pre class="output {{role}}" *ngIf="(role === 'user') || (role === 'system'); else elseBlock">{{content|hideUrlSource}}</pre>
   <ng-template #elseBlock><pre class="output {{role}}" highlight-js [innerHTML]="content"></pre></ng-template>
 </div>

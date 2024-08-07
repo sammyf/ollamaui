@@ -200,7 +200,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       let highlightedCode = this.utilService.DoHighlight(this.answer);
 
       this.chat_history.push({index:this.chat_index, role: "assistant", content:  highlightedCode, persona: this.selectedPersona});
-      let rs = JSON.stringify(this.reverseTruncateHistory(4000))
+      let rs = JSON.stringify(this.reverseTruncateHistory(500))
       this.localStorage.setItem('chat_history', rs);
       this.showSpinner(false);
     }

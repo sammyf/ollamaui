@@ -61,7 +61,7 @@ export class UtilsService {
       let url = match[1];
       console.log(`matched URL : =${url}`);
       let body = await this.ttsService.fetchUrl(url);
-      let result = `<LINKED url="${url}" ReturnCode="${body.returnCode}">${body.content}</LINKED>`;
+      let result = ` ( url:"${url}",  ReturnCode:${body.returnCode} )<LINKED>${body.content}</LINKED>`;
       source = source.replace(url, this.TruncateToTokens(result,MAX_TOKENS));
     };
     return source; // This fetches the URL data and replaces the original URL with it wrapped in "<LINKED URL>{{FetchUrl(URL)}}</LINKED URL>" format.
