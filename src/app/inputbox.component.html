@@ -19,7 +19,7 @@
     <img src="../assets/images/loader.gif" id="spinner" class="spinner" *ngIf="spinnerState" />
   </div>
   <div class="input_container">
-    <textarea class="input_box" id="user_input" placeholder="Write here." (keyup)="KeyUp($event)" [(ngModel)]="user_input"></textarea>
+    <textarea  autofocus="true" [disabled]="spinnerState" class="input_box" id="user_input" placeholder="Write here." (keyup)="KeyUp($event)" [(ngModel)]="user_input"></textarea>
     <audio  [src]="safeUrl" id="ttsPlayer" autoplay type="audio/wav" #TTSPlayer controls (volumechange)="SetTTSVolume()">
       Your browser does not support the audio element.
     </audio>

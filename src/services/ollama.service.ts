@@ -2,12 +2,11 @@ import {Injectable, model, NgModule, Renderer2} from '@angular/core';
 import {HttpClient, HttpClientModule, HttpHeaders, provideHttpClient, withInterceptors} from '@angular/common/http';
 import {
   Answer,
-  LLMAnswer,
+  LLMAnswer, Messages,
   Model,
   Models, Prompt, PsModelsData,
 } from '../models/ollama.models';
-import {CookieStorageService} from './cookie-storage.service';
-import {lastValueFrom} from 'rxjs';
+import {firstValueFrom, lastValueFrom} from 'rxjs';
 import {timeout} from 'rxjs/operators';
 import {environment} from '../environments/environment';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -55,29 +54,61 @@ export class OllamaService {
     }
   }
 
-  async getAnswer({postData}: Answer): Promise<string | undefined> {
+  //
+  // Prompting Ollama must be done via a queue, to avoid CloudFlare timeouts (returncode 524)
+  //
+  async sendRequest({postData}: Answer): Promise<string | undefined> {
     try {
       const headers = new HttpHeaders({
         'content-type': 'application/json',
         'encoding': 'utf-8',
       });
-      const response = await lastValueFrom(
-        this.http.post<LLMAnswer>(
-          `${this.url}/chat?cache=${Math.floor(Math.random() * 10000000)}`,
+      const requestId:{uuid:string} = await lastValueFrom(
+        this.http.post<{uuid:string}>(
+          `${environment.serverUrl}/companion/request?cache=${Math.floor(Math.random() * 10000000)}`,
           postData,
           {
             responseType: 'json',
             headers: headers
           }
-        ) .pipe(timeout(600000))
+        ) .pipe(timeout(50000))
       );
-
+      console.log("requestId",requestId.uuid);
       // @ts-ignore
+      return this.waitForAnswer(requestId.uuid);
+    } catch (error) {
+      console.error(error);
+      console.log('There was an error while sending the Request');
+      return "Error";
+    }
+  }
+
+  async waitForAnswer(uuid: string) {
+    try {
+      const headers = new HttpHeaders({
+        'content-type': 'application/json',
+        'encoding': 'utf-8',
+      });
+      let response: LLMAnswer
+      do {
+        response = await lastValueFrom(
+          this.http.get<LLMAnswer>(
+            `${environment.serverUrl}/companion/response/${uuid}`,
+            {
+              responseType: 'json',
+              headers: headers
+            }
+          ).pipe(timeout(50000))
+        );
+        if (response.model === "still processing") {
+          await new Promise(resolve => setTimeout(resolve, 5000)); // sleep for 5 seconds
+        }
+      } while (response.model === "still processing");
       return response.message.content;
     } catch (error) {
       console.error(error);
-      console.log('There was an error while getAnswer');
-      return this.getAnswer({postData});
+      console.log('There was an error while sending the Request');
+      return "Error 2";
     }
   }
 
@@ -115,7 +146,27 @@ export class OllamaService {
       "messages": [],
       "keep_alive": 0
     };
-    await this.getAnswer({postData});
+    const headers = new HttpHeaders({
+      'content-type': 'application/json',
+      'encoding': 'utf-8',
+    });
+
+    try {
+      const modelsData = await firstValueFrom(
+        this.http.post<any>(
+          `${this.url}/chat?cache=${Math.floor(Math.random() * 10000000)}`,
+          postData,
+          {
+            responseType: 'json',
+            headers: headers,
+          }
+        )
+      );
+      return;
+    } catch (error) {
+      console.error(error);
+      return;
+    }
     return;
   }
 }

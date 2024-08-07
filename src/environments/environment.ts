@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  serverUrl: '[YOUR PROD SERVER URL]' // development server URL
+  serverUrl: 'https://beezle.cosmic-bandito.com' // development server URL
 };

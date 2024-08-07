@@ -190,7 +190,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
         "keep_alive": -1
       };
       this.user_input = "";
-      this.answer = await this.ollamaService.getAnswer({postData: postData})??"Something went wrong.";
+      this.answer = await this.ollamaService.sendRequest({postData: postData})??"Something went wrong.";
       this.ttsClip = await this.ttsService.getTTS(this.answer, this.currentPersona?.speaker??"p243");
       this.updateAudioSource();
       this.chat_index += 1;
