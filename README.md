@@ -1,21 +1,31 @@
 # Ollamaui
+## Here is what it looks like ...
+
+![screenshot.png](src/assets/images/screenshot.png)
 
 This code comes with no guarantee whatsoever. You'll need to have an ollama server running under the 
-same URL to bypass CORS, and if you use the companion app it will need to use the same URL too.
+same URL to bypass CORS, and ~~if you use the companion app~~ the companion app you WILL need to make this work, 
+will need to use the same URL too and have direct access to Ollama without using URL's! This change was needed 
+to fix timeouts caused by too long request being blocked by CloudFlare. 
 
 Just to be clear : this is just something I barfed out to get to speed with Angular18, so much is left 
 to be desired in the way things are done and once I have the skills I need I might just drop the project
-alltogether. So don't expect help running it or me fixing issues you find. If you like it then I really 
+altogether. So don't expect help running it or me fixing issues you find. If you like it then I really 
 encourage you to fork it and work on it yourself. Coding is a fun activity when it's raining outside.
+
+### REQUIREMENT : 
 
 * The excellent Ollama can found at https://ollama.com/
 * The TTS companion application can be found at https://github.com/sammyf/tts_webapp 
 
-No tests included as of yet. Working on them.
+### HOW TO RUN IT :
+`npm install`
 
-HOW TO RUN IT :
-npm install 
-ng serve 
+`ng serve`
+
+
+
+![logo-medium.png](src/assets/images/logo-medium.png)
 
 ---------------------
 
