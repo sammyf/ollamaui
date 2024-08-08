@@ -14,7 +14,7 @@
 <div id="container">
   <div class="outputbox" id="history" onChange="ScrollDown()" #scrollContainer>
     @for ( msg of chat_history; track msg.index) {
-      <chat_box [persona]="msg.persona" [role]="msg.role" [content]="msg.content"></chat_box>
+      <chat_box [persona]="msg.persona" [role]="msg.role" [content]="msg.content" (change)="SetPersona('', true)"></chat_box>
     }
     <img src="../assets/images/loader.gif" id="spinner" class="spinner" *ngIf="spinnerState" />
   </div>

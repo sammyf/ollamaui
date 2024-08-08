@@ -51,7 +51,6 @@ export class UtilsService {
 
   // Internet Connection
   //
-
   async ReplaceUrls(source:string):Promise<string> {
     let urlRegex: RegExp = /(https?:\/\/[^\s]+)/gi; // This is a regular expression that matches URLs.
     let result: UrlResponse;
@@ -61,8 +60,9 @@ export class UtilsService {
       let url = match[1];
       console.log(`matched URL : =${url}`);
       let body = await this.ttsService.fetchUrl(url);
-      let result = ` ( url:"${url}",  ReturnCode:${body.returnCode} )<LINKED>${body.content}</LINKED>`;
-      source = source.replace(url, this.TruncateToTokens(result,MAX_TOKENS));
+      let content = this.TruncateToTokens(body.content,MAX_TOKENS)
+      let result = ` ( url:"${url}",  ReturnCode:${body.returnCode} )<LINKED>${content}</LINKED>`;
+      source = source.replace(url, result);
     };
     return source; // This fetches the URL data and replaces the original URL with it wrapped in "<LINKED URL>{{FetchUrl(URL)}}</LINKED URL>" format.
   }

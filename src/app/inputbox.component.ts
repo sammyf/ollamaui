@@ -118,24 +118,36 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   async ngOnInit() {
     this.showSpinner(true);
+    this.model_array = await this.ollamaService.getModels();
+
     let currentModel = await this.ollamaService.GetCurrentModel();
+    console.log(currentModel);
     if(currentModel === "None") {
-      if ((this.localStorage.getItem("currentModel") !== undefined) && (this.localStorage.getItem("currentModel") !== "")) {
+      if ((this.localStorage.getItem("currentModel") !== undefined) &&
+        (this.localStorage.getItem("currentModel") !== "") &&
+        (this.CheckModelName(this.localStorage.getItem("currentModel")??"None"))) {
         this.selectedModel = this.localStorage.getItem("currentModel") ?? "";
       } else {
-        this.selectedModel = this.DefaultModel;
+        let r: number = Math.floor(Math.random() * this.model_array.length);
+        this.selectedModel = this.model_array[r].name;
       }
     }  else {
-      this.selectedModel = currentModel;
+      this.selectedModel=currentModel
     }
     this.previousModel = this.selectedModel;
 
-    if(this.localStorage.getItem("currentPersona") !== undefined) {
+    this.previousSelectedPersona = "an personality-less entity";
+
+    if((this.localStorage.getItem("currentPersona") !== undefined) &&
+      (this.localStorage.getItem("currentPersona") !== "") &&
+      (this.CheckPersonaName(this.localStorage.getItem("currentPersona")??"None")) ) {
+      console.log("stored persona"+this.localStorage.getItem("currentPersona"));
       this.selectedPersona = this.localStorage.getItem("currentPersona") ?? "";
     } else {
-      this.selectedPersona = this.DefaultPersona;
+      let r: number = Math.floor(Math.random() * this.personas.length);
+      this.selectedPersona = this.personas[r].name;
     }
-    this.model_array = await this.ollamaService.getModels();
+
     // @ts-ignore
     this.model_array = [...this.model_array].sort((a, b) => {
       let al= a.name.toLowerCase();
@@ -144,11 +156,21 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       if (al > bl) return 1;
       return 0;
     });
-    this.showSpinner(false);
 
+    this.username = this.localStorage.getItem("username") ?? "not set";
+    let volume:number = 0.5;
+    try {
+      volume = parseFloat(this.localStorage.getItem("volume")??"0.5");
+    } catch(error) {
+      volume = 0.5
+    }
 
+    console.log("Volume is: ", volume);
     // @ts-ignore
-    this.audioPlayer.nativeElement.volume = parseFloat(this.localStorage.getItem("volume"));
+    this.audioPlayer.nativeElement.volume = volume;
+    this.SetPersona("", true);
+
+    this.showSpinner(false);
   }
 
   async KeyUp(e: KeyboardEvent) {
@@ -158,13 +180,14 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.username = this.utilService.GetUsername();
       if(this.previousSelectedPersona === "" || this.previousSelectedPersona === undefined) {
         this.previousSelectedPersona = this.selectedPersona;
-        this.SetPersona("");
+        this.SetPersona(`You are ${this.selectedPersona}`,false);
       } else if(this.selectedPersona !== this.previousSelectedPersona){
-        this.SetPersona(`** BEEP ** Personality switch happening! ${this.previousSelectedPersona} disappears in a digital puff of magical bytes. YOU are ${this.selectedPersona}, and at your place used to be ${this.previousSelectedPersona}. I, on the other hand, am ${this.username}!  *** BEEP *** `);
+        this.SetPersona('', true);
         this.previousSelectedPersona = this.selectedPersona;
         //this.chat_history = new Array<Messages>();
-      } else if( this.username !== undefined && this.username !== "" && this.username !== this.previousUsername) {
-        this.SetContext("")
+      }
+      if( this.username !== undefined && this.username !== "" && this.username !== this.previousUsername) {
+        this.SetContext(`You, the AI, are ${this.selectedPersona}. my, the user, name is ${this.username}`);
       }
       this.previousUsername = this.username;
       this.chat_index += 1;
@@ -206,8 +229,33 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     }
   }
 
-  SetPersona(contextAdd:string ) {
+  CheckModelName(model:string):boolean {
+    if (model) {
+      let exists = this.model_array.some(item => item.name === model);
+      if (exists) {
+        return true
+      }
+    }
+    return false;
+  }
+
+  CheckPersonaName(name:string):boolean {
+    if (name) {
+      let exists = this.personas.some(item => item.name === name);
+      if (exists) {
+        return true
+      }
+    }
+    return false;
+  }
+
+  SetPersona(contextAdd:string, personaSwitch:boolean) {
+    if(personaSwitch) {
+      contextAdd = `** BEEP ** Personality switch happening! ${this.previousSelectedPersona} disappears in a digital puff of magical bytes. YOU are ${this.selectedPersona}, and at your place used to be ${this.previousSelectedPersona}. I, on the other hand, am ${this.username}!  *** BEEP ***\n${contextAdd}`
+    }
     this.previousSelectedPersona = this.selectedPersona;
+    console.log("selectedPersona: "+this.selectedPersona);
+
     this.currentPersona = this.personas.find(persona => persona.name === this.selectedPersona);
     this.localStorage.setItem("currentPersona", this.selectedPersona);
     this.SetContext(contextAdd);
