@@ -16,9 +16,10 @@ import {CommonModule} from "@angular/common";
 })
 export class UsernamePopupComponent {
   @Input() showme = true;
+  username: string = "";
   constructor(private utilsService: UtilsService) {
   }
-  username:string = "";
+
   ngOnInit(): void {
     this.username = this.utilsService.GetUsername();
     if (this.username !== null || this.username !== "") {
@@ -29,5 +30,12 @@ export class UsernamePopupComponent {
   StoreName() {
     this.utilsService.SetUsername(this.username);
     this.showme = false;
+  }
+
+  CheckForReturn(e: KeyboardEvent) {
+    // console.log(this.user_input)
+    if (e.key === 'Enter') {
+      this.StoreName();
+    }
   }
 }

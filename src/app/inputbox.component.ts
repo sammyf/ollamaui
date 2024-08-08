@@ -46,6 +46,8 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   url = `${environment.serverUrl}/api`;
   @ViewChild(ChatBoxComponent) ChatBoxReference: ChatBoxComponent | undefined;
   @ViewChild('scrollContainer') private ScrollContainer: ElementRef | undefined;
+  @ViewChild('textInput') private textInputElement: ElementRef | undefined;
+
   @ViewChild('TTSPlayer') audioPlayer: ElementRef | undefined;
 
   // @ts-ignore
@@ -114,6 +116,10 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   private showSpinner(onoff:boolean) {
     this.spinnerState = onoff;
+    if (!onoff) {
+      // @ts-ignore
+      setTimeout(() => this.textInputElement.nativeElement.focus(), 0);
+    }
   }
 
   async ngOnInit() {
@@ -186,6 +192,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
         this.previousSelectedPersona = this.selectedPersona;
         //this.chat_history = new Array<Messages>();
       }
+      this.username = this.utilService.GetUsername();
       if( this.username !== undefined && this.username !== "" && this.username !== this.previousUsername) {
         this.SetContext(`You, the AI, are ${this.selectedPersona}. my, the user, name is ${this.username}`);
       }
@@ -217,9 +224,6 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.ttsClip = await this.ttsService.getTTS(this.answer, this.currentPersona?.speaker??"p243");
       this.updateAudioSource();
       this.chat_index += 1;
-      // const highlightedCode = hljs.highlightAuto(
-      //   this.answer,
-      // ).value
       let highlightedCode = this.utilService.DoHighlight(this.answer);
 
       this.chat_history.push({index:this.chat_index, role: "assistant", content:  highlightedCode, persona: this.selectedPersona});
@@ -271,13 +275,11 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     let cnt : number = 0;
     const buffer = 10;
     let revHist = [...this.chat_history].reverse();
-
-    // Using a 'for' loop
     for(let i = 0; i < revHist.length; i++) {
       rs.push(revHist[i]);
       cnt += revHist[i].content.length + revHist[i].role.length + buffer;
       if (cnt >= size) {
-        break; // Early termination of the loop
+        break;
       }
     }
 

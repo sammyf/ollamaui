@@ -76,18 +76,25 @@ div.input_container {
   padding: 7px;
 }
 
-#clear_username {
+input.set_username {
   background-color: darkcyan;
   color: white;
   font-weight: bolder;
   font-family: HACK;
   width:150px;
   padding: 3px;
+  border-radius: 15px;
+}
+
+div.set_username {
   position: fixed;
+  width:175px;
   left: 50%;
   transform: translateX(-50%);
   margin-top: 3px;
-  border-radius: 15px;
+  text-align: center;
+  font-family: HACK;
+  font-size: small;
 }
 
 #uname_container {

@@ -1,7 +1,9 @@
-import { Injectable } from '@angular/core';
+import {Injectable, input} from '@angular/core';
 import hljs from "highlight.js";
 import {UrlRequest, UrlResponse} from "../models/tts.models";
 import {TtsService} from "./tts.service";
+import {LocalStorageService} from "./local-storage.service";
+import {InputBoxComponent} from "../app/inputbox.component";
 
 const MAX_TOKENS: number = 1000;
 
@@ -10,7 +12,8 @@ const MAX_TOKENS: number = 1000;
 })
 export class UtilsService {
 
-  constructor(private ttsService: TtsService) {
+  constructor(private ttsService: TtsService,
+              private localStorage: LocalStorageService,) {
   }
 
   GetTimeDate():string {
@@ -92,9 +95,11 @@ export class UtilsService {
 
   SetUsername(username:string): void {
     this.username = username;
+    this.localStorage.setItem('username', username);
   }
 
   ClearUsername(): void {
     this.username = "";
+    this.localStorage.removeItem('username');
   }
 }

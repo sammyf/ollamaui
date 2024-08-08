@@ -4,7 +4,12 @@
     <option [value]="model.name">{{model.name}} ({{model.details.parameter_size}} / {{model.details.quantization_level}})</option>
   }
 </select>
-<input type="button" value="Set Name" id="clear_username" (click)="ClearUsername()">
+
+<div class="set_username">
+  Your name:
+  <input type="button" [value]="username" class="set_username" (click)="ClearUsername()">
+</div>
+
 <select class="personas" id="personas" [(ngModel)]="selectedPersona">
   @for ( p of personas; track p.name) {
     <option [value]="p.name">{{p.name}} : {{p.role}}</option>
@@ -19,7 +24,7 @@
     <img src="../assets/images/loader.gif" id="spinner" class="spinner" *ngIf="spinnerState" />
   </div>
   <div class="input_container">
-    <textarea  autofocus="true" [disabled]="spinnerState" class="input_box" id="user_input" placeholder="Write here." (keyup)="KeyUp($event)" [(ngModel)]="user_input"></textarea>
+    <textarea #textInput autofocus="true" [disabled]="spinnerState" class="input_box" id="user_input" placeholder="Write here." (keyup)="KeyUp($event)" [(ngModel)]="user_input"></textarea>
     <audio  [src]="safeUrl" id="ttsPlayer" autoplay type="audio/wav" #TTSPlayer controls (volumechange)="SetTTSVolume()">
       Your browser does not support the audio element.
     </audio>
