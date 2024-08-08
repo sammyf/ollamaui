@@ -90,6 +90,7 @@ export class UtilsService {
   username:string="";
 
   GetUsername(): string {
+    this.username = this.localStorage.getItem("username") ?? "not set";
     return this.username;
   }
 
