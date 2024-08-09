@@ -1,3 +1,10 @@
+// TODO:
+//     * Create a chat_history_buffer and a button to display the whole conversation as a single page
+//     * Add a button to clear the chat_history
+//     * Searx Engine Support
+//     * Talk to remote LLM
+//     * image and file upload
+//     * Autonomous Personal change
 import {
   Component,
   ViewChild,

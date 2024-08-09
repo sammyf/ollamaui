@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  serverUrl: '[YOUR SERVER HERE]', // production server URL
+  serverUrl: '[SERVER URL]', // production server URL
 };
