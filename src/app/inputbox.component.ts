@@ -114,7 +114,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       return 0;
     });
     if( this.chat_history.length > 0) {
-      this.chat_index = this.chat_history[this.chat_history.length - 1].index;
+      this.chat_index = this.chat_history[this.chat_history.length-1].index;
     }
     this.chat_history.push({index: this.chat_index, role: "system", content: this.system_prompt, persona:"user"});
   };
@@ -234,7 +234,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       let highlightedCode = this.utilService.DoHighlight(this.answer);
 
       this.chat_history.push({index:this.chat_index, role: "assistant", content:  highlightedCode, persona: this.selectedPersona});
-      let rs = JSON.stringify(this.reverseTruncateHistory(500))
+      let rs = JSON.stringify(this.reverseTruncateHistory(4000))
       this.localStorage.setItem('chat_history', rs);
       this.showSpinner(false);
     }
