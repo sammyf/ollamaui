@@ -25,9 +25,12 @@
   </div>
   <div class="input_container">
     <textarea #textInput autofocus="true" [disabled]="spinnerState" class="input_box" id="user_input" placeholder="Write here." (keyup)="KeyUp($event)" [(ngModel)]="user_input"></textarea>
+    <div class="bottom_tools">
+      <span id="print"><a routerLink="/show_memory" target="_blank">print or save discussion</a></span><br>
     <audio  [src]="safeUrl" id="ttsPlayer" autoplay type="audio/wav" #TTSPlayer controls (volumechange)="SetTTSVolume()">
       Your browser does not support the audio element.
     </audio>
+    </div>
   </div>
   <app-username-popup id="uname_container" [showme]="showUsernamePopup"></app-username-popup>
 </div>

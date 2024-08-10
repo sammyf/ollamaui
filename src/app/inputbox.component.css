@@ -112,3 +112,23 @@ div.set_username {
   margin-left: auto;
   margin-right: auto;
 }
+
+div.bottom_tools {
+  text-align: center;
+  font-family: HACK;
+  font-size: smaller;
+}
+
+a:hover {
+  color: gold;
+}
+
+a:active {
+  color: lawngreen;
+}
+
+a:visited {
+  color: black;
+}
+
+

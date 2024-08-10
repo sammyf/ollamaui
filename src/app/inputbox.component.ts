@@ -31,6 +31,7 @@ import {Event} from "@angular/router";
 import { environment } from '../environments/environment';
 // Highlighter
 import hljs from 'highlight.js';
+import {Message} from "nx/src/daemon/client/daemon-socket-messenger";
 
 /* TODO :
   * permanent memory
@@ -81,7 +82,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   selectedModel:string = this.DefaultModel;
   previousModel:string = this.selectedModel;
-
+  model:Model | undefined = undefined;
   selectedPersona:string = this.DefaultModel;
   spinnerState:boolean = true;
 
@@ -91,6 +92,8 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   system_prompt: string = this.DefaultContext;
 
   chat_history:Array<Messages>;
+  chat_memory:Array<Messages>;
+
   chat_index:number = 0;
 
   constructor(private http: HttpClient,
@@ -117,6 +120,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.chat_index = this.chat_history[this.chat_history.length-1].index;
     }
     this.chat_history.push({index: this.chat_index, role: "system", content: this.system_prompt, persona:"user"});
+    this.chat_memory = this.chat_history
   };
 
   model_array: Array<Model> = new Array<Model>();
@@ -134,7 +138,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     this.model_array = await this.ollamaService.getModels();
 
     let currentModel = await this.ollamaService.GetCurrentModel();
-    console.log(currentModel);
+
     if(currentModel === "None") {
       if ((this.localStorage.getItem("currentModel") !== undefined) &&
         (this.localStorage.getItem("currentModel") !== "") &&
@@ -150,7 +154,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     this.previousModel = this.selectedModel;
 
     this.previousSelectedPersona = "an personality-less entity";
-
+    this.model = this.GetModel();
     if((this.localStorage.getItem("currentPersona") !== undefined) &&
       (this.localStorage.getItem("currentPersona") !== "") &&
       (this.CheckPersonaName(this.localStorage.getItem("currentPersona")??"None")) ) {
@@ -212,13 +216,15 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.localStorage.setItem('chat_history',JSON.stringify(this.chat_history));
 
       if((this.selectedModel === undefined) || (this.selectedModel === "")) {
-        this.selectedModel = this.DefaultModel;
+        let r: number = Math.floor(Math.random() * this.model_array.length);
+        this.selectedModel = this.model_array[r].name;
       }
       if(this.previousModel !== this.previousModel){
         this.ollamaService.UnloadModel(this.previousModel);
         this.previousModel = this.selectedModel;
       }
       this.localStorage.setItem("currentModel",this.selectedModel);
+      this.model = this.GetModel();
       let postData: Prompt = {
         "model": this.selectedModel,
         "stream": false,
@@ -234,10 +240,20 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       let highlightedCode = this.utilService.DoHighlight(this.answer);
 
       this.chat_history.push({index:this.chat_index, role: "assistant", content:  highlightedCode, persona: this.selectedPersona});
-      let rs = JSON.stringify(this.reverseTruncateHistory(4000))
+      let rs = JSON.stringify(this.reverseTruncateHistory(5000))
       this.localStorage.setItem('chat_history', rs);
       this.showSpinner(false);
     }
+  }
+
+  GetModel():Model|undefined {
+    return this.model_array.find(model => model.name === this.selectedModel);
+  }
+  AddToChat(entry:Messages): void {
+    this.chat_history.push(entry);
+    this.chat_memory.push(entry);
+    this.chat_index +=1;
+    this.chat_history = this.reverseTruncateHistory( 64000 );
   }
 
   CheckModelName(model:string):boolean {
