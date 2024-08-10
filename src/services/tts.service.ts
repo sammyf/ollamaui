@@ -10,7 +10,7 @@ import { environment } from '../environments/environment';
 export class TtsService {
   constructor(private http: HttpClient) {
   }
-  url: string = `${environment.serverUrl}/companion`;
+  url: string = `${environment.companionUrl}/companion`;
 
   async getTTS(text:string, voice:string):Promise<string> {
     let ttsRequest:TtsRequest = {
@@ -20,7 +20,7 @@ export class TtsService {
     try{
     const response:TtsResponse = await lastValueFrom(
       this.http.post<TtsResponse>(
-        `${this.url}/tts/generate?cache=${Math.floor(Math.random() * 10000000)}`,
+        `${environment.companionUrl}/tts/generate?cache=${Math.floor(Math.random() * 10000000)}`,
         ttsRequest,
         {
           responseType: 'json',
@@ -28,7 +28,7 @@ export class TtsService {
       )
     );
       // @ts-ignore
-      return this.url+"/tts/output/"+response.url;
+      return `${environment.companionUrl}/tts/output/${response.url}`;
     } catch (error) {
       console.error(error);
       return 'No TTS Answer.';
@@ -42,7 +42,7 @@ export class TtsService {
     try{
       let response:UrlResponse =  await lastValueFrom(
         this.http.post<UrlResponse>(
-          `${this.url}/spider?cache=${Math.floor(Math.random() * 10000000)}`,
+          `${environment.companionUrl}/spider?cache=${Math.floor(Math.random() * 10000000)}`,
           urlRequest,
           {
             responseType: 'json',

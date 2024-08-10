@@ -40,7 +40,7 @@ export class OllamaService {
     try {
       const models = await lastValueFrom(
         this.http.get<Models>(
-          `${environment.serverUrl}/companion/tags?cache=${Math.floor(Math.random() * 10000000)}`,
+          `${environment.companionUrl}/companion/tags?cache=${Math.floor(Math.random() * 10000000)}`,
           {
             responseType: 'json',
             headers: headers,
@@ -65,7 +65,7 @@ export class OllamaService {
       });
       const requestId:{uuid:string} = await lastValueFrom(
         this.http.post<{uuid:string}>(
-          `${environment.serverUrl}/companion/request?cache=${Math.floor(Math.random() * 10000000)}`,
+          `${environment.companionUrl}/companion/request?cache=${Math.floor(Math.random() * 10000000)}`,
           postData,
           {
             responseType: 'json',
@@ -93,7 +93,7 @@ export class OllamaService {
       do {
         response = await lastValueFrom(
           this.http.get<LLMAnswer>(
-            `${environment.serverUrl}/companion/response/${uuid}`,
+            `${environment.companionUrl}/companion/response/${uuid}`,
             {
               responseType: 'json',
               headers: headers
@@ -121,7 +121,7 @@ export class OllamaService {
     try {
       const modelsData = await lastValueFrom(
         this.http.get<PsModelsData>(
-          `${environment.serverUrl}/companion/ps?cache=${Math.floor(Math.random() * 10000000)}`,
+          `${environment.companionUrl}/companion/ps?cache=${Math.floor(Math.random() * 10000000)}`,
           {
             responseType: 'json',
             headers: headers,
@@ -154,7 +154,7 @@ export class OllamaService {
     try {
       const modelsData = await firstValueFrom(
         this.http.post<any>(
-          `${this.url}/chat?cache=${Math.floor(Math.random() * 10000000)}`,
+          `${environment.companionUrl}/Unload?cache=${Math.floor(Math.random() * 10000000)}`,
           postData,
           {
             responseType: 'json',
