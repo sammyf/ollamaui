@@ -152,16 +152,14 @@ export class OllamaService {
     });
 
     try {
-      const modelsData = await firstValueFrom(
         this.http.post<any>(
-          `${environment.companionUrl}/Unload?cache=${Math.floor(Math.random() * 10000000)}`,
+          `${environment.companionUrl}/companion/unload?cache=${Math.floor(Math.random() * 10000000)}`,
           postData,
           {
             responseType: 'json',
             headers: headers,
           }
         )
-      );
       return;
     } catch (error) {
       console.error(error);
