@@ -20,7 +20,7 @@ export class TtsService {
     try{
     const response:TtsResponse = await lastValueFrom(
       this.http.post<TtsResponse>(
-        `${environment.companionUrl}/tts/generate?cache=${Math.floor(Math.random() * 10000000)}`,
+        `${environment.companionUrl}/companion/tts/generate?cache=${Math.floor(Math.random() * 10000000)}`,
         ttsRequest,
         {
           responseType: 'json',
@@ -28,7 +28,7 @@ export class TtsService {
       )
     );
       // @ts-ignore
-      return `${environment.companionUrl}/tts/output/${response.url}`;
+      return `${environment.companionUrl}/companion/tts/output/${response.url}`;
     } catch (error) {
       console.error(error);
       return 'No TTS Answer.';
