@@ -219,7 +219,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
         let r: number = Math.floor(Math.random() * this.model_array.length);
         this.selectedModel = this.model_array[r].name;
       }
-      if(this.previousModel !== this.previousModel){
+      if((this.selectedModel !== this.previousModel) && ( this.previousModel != "")) {
         this.ollamaService.UnloadModel(this.previousModel);
         this.previousModel = this.selectedModel;
       }
