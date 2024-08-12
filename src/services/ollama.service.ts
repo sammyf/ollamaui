@@ -93,7 +93,7 @@ export class OllamaService {
       do {
         response = await lastValueFrom(
           this.http.get<LLMAnswer>(
-            `${environment.companionUrl}/companion/response/${uuid}`,
+            `${environment.companionUrl}/async/response?uid=${uuid}`,
             {
               responseType: 'json',
               headers: headers
