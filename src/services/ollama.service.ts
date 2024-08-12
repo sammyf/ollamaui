@@ -63,8 +63,8 @@ export class OllamaService {
         'content-type': 'application/json',
         'encoding': 'utf-8',
       });
-      const requestId:{uuid:string} = await lastValueFrom(
-        this.http.post<{uuid:string}>(
+      const requestId: {uniqueID:string} = await lastValueFrom(
+        this.http.post<{uniqueID:string}>(
           `${environment.companionUrl}/async/chat?cache=${Math.floor(Math.random() * 10000000)}`,
           postData,
           {
@@ -73,9 +73,9 @@ export class OllamaService {
           }
         ) .pipe(timeout(50000))
       );
-      console.log("requestId",requestId.uuid);
+      console.log("requestId",requestId.uniqueID);
       // @ts-ignore
-      return this.waitForAnswer(requestId.uuid);
+      return this.waitForAnswer(requestId.uniqueID);
     } catch (error) {
       console.error(error);
       console.log('There was an error while sending the Request');
