@@ -65,7 +65,7 @@ export class OllamaService {
       });
       const requestId:{uuid:string} = await lastValueFrom(
         this.http.post<{uuid:string}>(
-          `${environment.companionUrl}/companion/request?cache=${Math.floor(Math.random() * 10000000)}`,
+          `${environment.companionUrl}/async/chat?cache=${Math.floor(Math.random() * 10000000)}`,
           postData,
           {
             responseType: 'json',
