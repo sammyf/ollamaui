@@ -40,7 +40,7 @@ export class OllamaService {
     try {
       const models = await lastValueFrom(
         this.http.get<Models>(
-          `${environment.companionUrl}/companion/tags?cache=${Math.floor(Math.random() * 10000000)}`,
+          `${environment.companionUrl}/async/tags?cache=${Math.floor(Math.random() * 10000000)}`,
           {
             responseType: 'json',
             headers: headers,
@@ -121,7 +121,7 @@ export class OllamaService {
     try {
       const modelsData = await lastValueFrom(
         this.http.get<PsModelsData>(
-          `${environment.companionUrl}/companion/ps?cache=${Math.floor(Math.random() * 10000000)}`,
+          `${environment.companionUrl}/async/ps?cache=${Math.floor(Math.random() * 10000000)}`,
           {
             responseType: 'json',
             headers: headers,
@@ -153,7 +153,7 @@ export class OllamaService {
 
     try {
         this.http.post<any>(
-          `${environment.companionUrl}/companion/unload?cache=${Math.floor(Math.random() * 10000000)}`,
+          `${environment.companionUrl}/async/unload?cache=${Math.floor(Math.random() * 10000000)}`,
           postData,
           {
             responseType: 'json',
