@@ -14,7 +14,7 @@ export class TtsService {
 
   async getTTS(text:string, voice:string):Promise<string> {
     let ttsRequest:TtsRequest = {
-    text:text,
+    text:text.replace("*",""),
     voice:voice
     }
     try{
