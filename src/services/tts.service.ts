@@ -13,8 +13,10 @@ export class TtsService {
   url: string = `${environment.companionUrl}/companion`;
 
   async getTTS(text:string, voice:string):Promise<string> {
+    text = text.replace(/\*/g,"");
+    console.log('New Text: ',text);
     let ttsRequest:TtsRequest = {
-    text:text.replace("*",""),
+    text:text,
     voice:voice
     }
     try{
