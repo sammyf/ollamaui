@@ -1,7 +1,4 @@
-<div id="full_chat" *ngIf="showFullChatToggle">
-  <div id="close_full_chat" (click)="showFullChatToggle=false">
-    X
-  </div>
+<div id="full_chat">
 @for ( msg of chat_memory; track msg.index) {
   <chat_box [persona]="msg.persona" [role]="msg.role" [content]="msg.content"></chat_box>
 }
