@@ -131,3 +131,9 @@ export class PsModel {
 export class PsModelsData {
   models: PsModel[] = [];
 }
+
+export class Memories {
+  public id:number = 0;
+  public date:Date = new Date();
+  public content: string = "";
+}

@@ -1,4 +1,4 @@
-
+<full_chat [chat_memory]="chat_memory" [showFullChatToggle]="showFullChatToggle"></full_chat>
 <select class="models" id="models" [(ngModel)]="selectedModel">
   @for ( model of model_array; track model.digest) {
     <option [value]="model.name">{{model.name}} ({{model.details.parameter_size}} / {{model.details.quantization_level}})</option>
@@ -26,7 +26,7 @@
   <div class="input_container">
     <textarea #textInput autofocus="true" [disabled]="spinnerState" class="input_box" id="user_input" placeholder="Write here." (keyup)="KeyUp($event)" [(ngModel)]="user_input"></textarea>
     <div class="bottom_tools">
-      <span id="print"><a routerLink="/show_memory" target="_blank">print or save discussion</a></span><br>
+      <span id="print"><a (click)="ShowFullChat()">show the full discussion</a></span><br>
     <audio  [src]="safeUrl" id="ttsPlayer" autoplay type="audio/wav" #TTSPlayer controls (volumechange)="SetTTSVolume()">
       Your browser does not support the audio element.
     </audio>

@@ -1,0 +1,14 @@
+#full_chat {
+  width: 100%;
+  padding-top: 50px;
+}
+
+#close_full_chat {
+  position: fixed;
+  top:5px;
+  right: 5px;
+  background-color: white;
+  color: red;
+  font-weight: bolder;
+  font-size: xx-large;
+}

@@ -27,11 +27,13 @@ import {UsernamePopupComponent} from "./username-popup/username-popup.component"
 import {TtsService} from "../services/tts.service";
 import {DomSanitizer, SafeHtml, SafeResourceUrl} from '@angular/platform-browser';
 import {runPostSignalSetFn} from "@angular/core/primitives/signals";
-import {Event} from "@angular/router";
+import {Event, Routes} from "@angular/router";
 import { environment } from '../environments/environment';
 // Highlighter
 import hljs from 'highlight.js';
 import {Message} from "nx/src/daemon/client/daemon-socket-messenger";
+import {fullChatComponent} from "./full_chat.component";
+import {MemoryService} from "../services/memory.service";
 
 /* TODO :
   * permanent memory
@@ -39,6 +41,12 @@ import {Message} from "nx/src/daemon/client/daemon-socket-messenger";
   * call to the internet/searx Engine
   * tests
  */
+const routes: Routes = [
+  {
+    path: '/showFullChat',
+    component: fullChatComponent
+  }
+  ];
 
 @Injectable({providedIn: 'root'})
 @Component({
@@ -46,10 +54,11 @@ import {Message} from "nx/src/daemon/client/daemon-socket-messenger";
   templateUrl: './inputbox.component.html',
   styleUrls: ['./inputbox.component.css'],
   standalone: true,
-  imports: [ChatBoxComponent, FormsModule, CommonModule, UsernamePopupComponent],
+  imports: [ChatBoxComponent, FormsModule, CommonModule, UsernamePopupComponent, fullChatComponent],
 })
 
 export class InputBoxComponent implements AfterViewChecked, OnInit {
+  newWindow: Window | null;
 
   url = `${environment.serverUrl}/api`;
   @ViewChild(ChatBoxComponent) ChatBoxReference: ChatBoxComponent | undefined;
@@ -91,16 +100,18 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   user_input: string = "";
   system_prompt: string = this.DefaultContext;
 
-  chat_history:Array<Messages>;
-  chat_memory:Array<Messages>;
+  chat_history:Array<Messages> = [];
+  chat_memory:Array<Messages> = [];
 
   chat_index:number = 0;
+  showFullChatToggle: boolean = false;
 
   constructor(private http: HttpClient,
               private renderer: Renderer2,
               private localStorage: LocalStorageService,
               private formsModule: FormsModule,
               private ollamaService: OllamaService,
+              private memoryService: MemoryService,
               private personasService: PersonasService,
               private cookieService: CookieStorageService,
               private utilService: UtilsService,
@@ -108,7 +119,11 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
               private sanitizer: DomSanitizer,
               private cdRef: ChangeDetectorRef
   ) {
+    this.newWindow = null;
     this.chat_history = JSON.parse(<string>localStorage.getItem('chat_history')) ?? new Array<Messages>();
+    if(this.chat_memory.length === 0) {
+      this.chat_memory = this.chat_history
+    }
     this.personas = personasService.getAllPersonas().sort((a:Persona, b:Persona) => {
       let al= a.name.toLowerCase();
       let bl = b.name.toLowerCase();
@@ -119,7 +134,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     if( this.chat_history.length > 0) {
       this.chat_index = this.chat_history[this.chat_history.length-1].index;
     }
-    this.chat_history.push({index: this.chat_index, role: "system", content: this.system_prompt, persona:"user"});
+    this.AddToChat({index: this.chat_index, role: "system", content: this.system_prompt, persona:"user"});
     this.chat_memory = this.chat_history
   };
 
@@ -208,11 +223,10 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
         this.SetContext(`You, the AI, are ${this.selectedPersona}. my, the user, name is ${this.username}`);
       }
       this.previousUsername = this.username;
-      this.chat_index += 1;
       console.log("this user input:"+this.user_input);
       let expandedUserInput = await this.utilService.ReplaceUrls(this.user_input)
       console.log("expanded : "+expandedUserInput);
-      this.chat_history.push({index:this.chat_index, role: "user", content: this.utilService.GetTimeDate()+expandedUserInput, persona:"user"});
+      this.AddToChat({index:this.chat_index, role: "user", content: this.utilService.GetTimeDate()+expandedUserInput, persona:"user"});
       this.localStorage.setItem('chat_history',JSON.stringify(this.chat_history));
 
       if((this.selectedModel === undefined) || (this.selectedModel === "")) {
@@ -236,10 +250,9 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.answer = await this.ollamaService.sendRequest({postData: postData})??"Something went wrong.";
       this.ttsClip = await this.ttsService.getTTS(this.answer, this.currentPersona?.speaker??"p243");
       this.updateAudioSource();
-      this.chat_index += 1;
       let highlightedCode = this.utilService.DoHighlight(this.answer);
 
-      this.chat_history.push({index:this.chat_index, role: "assistant", content:  highlightedCode, persona: this.selectedPersona});
+      this.AddToChat({index:this.chat_index, role: "assistant", content:  highlightedCode, persona: this.selectedPersona});
       let rs = JSON.stringify(this.reverseTruncateHistory(5000))
       this.localStorage.setItem('chat_history', rs);
       this.showSpinner(false);
@@ -249,11 +262,18 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   GetModel():Model|undefined {
     return this.model_array.find(model => model.name === this.selectedModel);
   }
+
   AddToChat(entry:Messages): void {
+    this.memoryService.StoreChatLog(entry);
     this.chat_history.push(entry);
     this.chat_memory.push(entry);
     this.chat_index +=1;
     this.chat_history = this.reverseTruncateHistory( 64000 );
+  }
+
+  ShowFullChat() {
+
+    this.newWindow = window.open('/showFullChat', '_blank');
   }
 
   CheckModelName(model:string):boolean {
@@ -290,7 +310,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   SetContext(contextAdd:string){
     this.system_prompt = this.currentPersona?.context??this.DefaultContext;
-    this.chat_history.push({index:this.chat_index, role: "system", content: this.system_prompt, persona: "user"});
+    this.AddToChat({index:this.chat_index, role: "system", content: this.system_prompt, persona: "user"});
   }
 
   reverseTruncateHistory(size:number):Array<Messages> {
@@ -333,6 +353,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   ClearUsername() {
     this.showUsernamePopup = true;
   }
+
 
   protected readonly parent = parent;
   protected readonly Event = Event;
