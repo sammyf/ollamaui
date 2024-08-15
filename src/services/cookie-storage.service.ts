@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {JsonParseOptions} from "nx/src/utils/json";
-import { environment } from '../environments/environment';
+import { environment } from '../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root',

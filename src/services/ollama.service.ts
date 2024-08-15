@@ -8,7 +8,7 @@ import {
 } from '../models/ollama.models';
 import {firstValueFrom, lastValueFrom} from 'rxjs';
 import {timeout} from 'rxjs/operators';
-import {environment} from '../environments/environment';
+import {environment} from '../environments/environment.prod';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import {increaseTimeoutInterceptor} from '../interceptors/httpInterceptor';
 import {bootstrapApplication} from "@angular/platform-browser";

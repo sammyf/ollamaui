@@ -2,7 +2,7 @@ import { Injectable, Renderer2 } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {TtsRequest, TtsResponse, UrlRequest, UrlResponse} from "../models/tts.models";
 import {lastValueFrom} from "rxjs";
-import { environment } from '../environments/environment';
+import { environment } from '../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'

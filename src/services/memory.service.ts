@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {UrlRequest, UrlResponse} from "../models/tts.models";
 import {lastValueFrom} from "rxjs";
-import {environment} from "../environments/environment";
+import {environment} from "../environments/environment.prod";
 import {Memories, Messages} from "../models/ollama.models";
 import {HttpClient} from "@angular/common/http";
 import {Message} from "nx/src/daemon/client/daemon-socket-messenger";
