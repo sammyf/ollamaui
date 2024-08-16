@@ -1,18 +1,22 @@
-import {Component, Injectable} from '@angular/core';
+import {Component, Injectable, Input} from '@angular/core';
 import { LoginService } from '../../services/login.service'; // You might need to adjust the path
 import { LoginResult } from '../../models/login.models'; // You might need to adjust the path
 import { Router } from '@angular/router';
+import {FormsModule} from "@angular/forms";
 
 @Injectable({providedIn: 'root'})
 @Component({
   selector: 'login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
+  imports: [
+    FormsModule
+  ],
   standalone: true
 })
 export class LoginComponent {
-  username: string = "";
-  password: string = "";
+  @Input() username: string = "";
+  @Input()password: string = "";
 
   constructor(private loginService: LoginService, private router: Router) {
   }

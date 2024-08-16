@@ -19,10 +19,11 @@ import {MemoryService} from "../../services/memory.service";
 })
 export class fullChatComponent implements OnInit {
   chat_memory: Array<Messages> = [];
+  @Input() csrfToken: string = "";
   constructor(private  memoryService: MemoryService) {
 
   }
   async ngOnInit() {
-    this.chat_memory = await this.memoryService.ReadChatLog();
+    this.chat_memory = await this.memoryService.ReadChatLog(this.csrfToken);
   }
 }
