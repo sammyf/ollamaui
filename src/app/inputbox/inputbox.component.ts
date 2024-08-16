@@ -34,6 +34,7 @@ import hljs from 'highlight.js';
 import {Message} from "nx/src/daemon/client/daemon-socket-messenger";
 import {fullChatComponent} from "../full_chat/full_chat.component";
 import {MemoryService} from "../../services/memory.service";
+import { ActivatedRoute } from '@angular/router';
 
 /* TODO :
   * permanent memory
@@ -119,7 +120,8 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
               private utilService: UtilsService,
               private ttsService: TtsService,
               private sanitizer: DomSanitizer,
-              private cdRef: ChangeDetectorRef
+              private cdRef: ChangeDetectorRef,
+              private route: ActivatedRoute
   ) {
     this.newWindow = null;
     this.chat_history = JSON.parse(<string>localStorage.getItem('chat_history')) ?? new Array<Messages>();
@@ -152,6 +154,9 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   async ngOnInit() {
     this.showSpinner(true);
+    this.route.params.subscribe(params => {
+      this.csrfToken = params['csrfToken'];
+    });
     this.model_array = await this.ollamaService.getModels();
 
     let currentModel = await this.ollamaService.GetCurrentModel();
