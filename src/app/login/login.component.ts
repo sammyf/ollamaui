@@ -2,7 +2,8 @@ import {Component, Injectable, Input} from '@angular/core';
 import { LoginService } from '../../services/login.service'; // You might need to adjust the path
 import { LoginResult } from '../../models/login.models'; // You might need to adjust the path
 import { Router } from '@angular/router';
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {CommonModule} from "@angular/common";
 
 @Injectable({providedIn: 'root'})
 @Component({
@@ -10,7 +11,9 @@ import {FormsModule} from "@angular/forms";
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
   imports: [
-    FormsModule
+    ReactiveFormsModule,
+    FormsModule,
+    CommonModule
   ],
   standalone: true
 })
