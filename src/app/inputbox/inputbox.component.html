@@ -20,7 +20,7 @@
     @for ( msg of chat_history; track msg.index) {
       <chat_box [persona]="msg.persona" [role]="msg.role" [content]="msg.content" (change)="SetPersona('', true)"></chat_box>
     }
-    <img src="../assets/images/loader.gif" id="spinner" class="spinner" *ngIf="spinnerState" />
+    <img src="../../assets/images/loader.gif" id="spinner" class="spinner" *ngIf="spinnerState" />
   </div>
   <div class="input_container">
     <textarea #textInput autofocus="true" [disabled]="spinnerState" class="input_box" id="user_input" placeholder="Write here." (keyup)="KeyUp($event)" [(ngModel)]="user_input"></textarea>

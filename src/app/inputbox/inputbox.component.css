@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'HACK';
-  src: url('../assets/fonts/HackNerdFontPropo-Regular.ttf');
+  src: url('../../assets/fonts/HackNerdFontPropo-Regular.ttf');
 }
 select.models {
   position: fixed;

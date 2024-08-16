@@ -15,25 +15,25 @@ import {
 } from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {LLMAnswer, Messages, Prompt, Models, Model, ModelDetails, ModelRedux, Persona} from "../models/ollama.models";
-import {ChatBoxComponent} from "./chat_box.component";
+import {LLMAnswer, Messages, Prompt, Models, Model, ModelDetails, ModelRedux, Persona} from "../../models/ollama.models";
+import {ChatBoxComponent} from "../chat-box/chat_box.component";
 import {CommonModule} from '@angular/common';
-import {LocalStorageService} from "../services/local-storage.service";
-import {OllamaService} from "../services/ollama.service";
-import {PersonasService} from "../services/personas.service";
-import {CookieStorageService} from "../services/cookie-storage.service";
-import {UtilsService} from "../services/utils.service";
-import {UsernamePopupComponent} from "./username-popup/username-popup.component";
-import {TtsService} from "../services/tts.service";
+import {LocalStorageService} from "../../services/local-storage.service";
+import {OllamaService} from "../../services/ollama.service";
+import {PersonasService} from "../../services/personas.service";
+import {CookieStorageService} from "../../services/cookie-storage.service";
+import {UtilsService} from "../../services/utils.service";
+import {UsernamePopupComponent} from "../username-popup/username-popup.component";
+import {TtsService} from "../../services/tts.service";
 import {DomSanitizer, SafeHtml, SafeResourceUrl} from '@angular/platform-browser';
 import {runPostSignalSetFn} from "@angular/core/primitives/signals";
 import {Event, Routes} from "@angular/router";
-import { environment } from '../environments/environment';
+import { environment } from '../../environments/environment';
 // Highlighter
 import hljs from 'highlight.js';
 import {Message} from "nx/src/daemon/client/daemon-socket-messenger";
-import {fullChatComponent} from "./full_chat.component";
-import {MemoryService} from "../services/memory.service";
+import {fullChatComponent} from "../full_chat/full_chat.component";
+import {MemoryService} from "../../services/memory.service";
 
 /* TODO :
   * permanent memory
@@ -60,12 +60,14 @@ const routes: Routes = [
 export class InputBoxComponent implements AfterViewChecked, OnInit {
   newWindow: Window | null;
 
-  url = `${environment.serverUrl}/api`;
+  url = `${environment.companionUrl}/api`;
   @ViewChild(ChatBoxComponent) ChatBoxReference: ChatBoxComponent | undefined;
   @ViewChild('scrollContainer') private ScrollContainer: ElementRef | undefined;
   @ViewChild('textInput') private textInputElement: ElementRef | undefined;
 
   @ViewChild('TTSPlayer') audioPlayer: ElementRef | undefined;
+
+  @Input() csrfToken: string = "";
 
   // @ts-ignore
   safeUrl: SafeResourceUrl;
@@ -264,7 +266,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   }
 
   AddToChat(entry:Messages): void {
-    this.memoryService.StoreChatLog(entry);
+    this.memoryService.StoreChatLog(this.csrfToken, entry);
     this.chat_history.push(entry);
     this.chat_memory.push(entry);
     this.chat_index +=1;

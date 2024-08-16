@@ -3,19 +3,19 @@ import {UrlRequest, UrlResponse} from "../models/tts.models";
 import {lastValueFrom} from "rxjs";
 import {environment} from "../environments/environment.prod";
 import {Memories, Messages} from "../models/ollama.models";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Message} from "nx/src/daemon/client/daemon-socket-messenger";
 
 @Injectable({
   providedIn: 'root'
 })
 export class MemoryService {
-  url:string;
+  url:string = `${environment.companionUrl}`;
   constructor(private http: HttpClient) {
-    this.url = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
   }
 
-  async StoreChatLog(msg:Messages) {
+  async StoreChatLog(csrfToken:string, msg:Messages) {
+    const headers = new HttpHeaders().set('X-CSRF-TOKEN', csrfToken);
     let chatMessage = {
       index: -1,
       persona:msg.persona,
@@ -28,6 +28,7 @@ export class MemoryService {
           `${environment.companionUrl}/async/storeChatLog?cache=${Math.floor(Math.random() * 10000000)}`,
           chatMessage,
           {
+            headers: headers,
             responseType: 'json',
           }
         )
@@ -40,12 +41,14 @@ export class MemoryService {
     }
   }
 
-  async ReadChatLog():Promise<Array<Messages>> {
+  async ReadChatLog(csrfToken:string):Promise<Array<Messages>> {
+    const headers = new HttpHeaders().set('X-CSRF-TOKEN', csrfToken);
     try{
       let response:Array<Messages> =  await lastValueFrom(
         this.http.get<Array<Messages>>(
           `${environment.companionUrl}/async/readChatLog?cache=${Math.floor(Math.random() * 10000000)}`,
           {
+            headers: headers,
             responseType: 'json',
           }
         )
@@ -59,12 +62,14 @@ export class MemoryService {
   }
 
 
-  async ReadMemories():Promise<Array<Memories>> {
+  async ReadMemories(csrfToken:string):Promise<Array<Memories>> {
+    const headers = new HttpHeaders().set('X-CSRF-TOKEN', csrfToken);
     try{
       let response:Array<Memories> =  await lastValueFrom(
         this.http.get<Array<Memories>>(
           `${environment.companionUrl}/async/readMemories?cache=${Math.floor(Math.random() * 10000000)}`,
           {
+            headers: headers,
             responseType: 'json',
           }
         )
@@ -77,12 +82,14 @@ export class MemoryService {
     }
   }
 
-  async GenerateMemories():Promise<void> {
+  async GenerateMemories(csrfToken:string):Promise<void> {
+    const headers = new HttpHeaders().set('X-CSRF-TOKEN', csrfToken);
     try{
       await lastValueFrom(
         this.http.get<void>(
           `${environment.companionUrl}/async/generateMemories?cache=${Math.floor(Math.random() * 10000000)}`,
           {
+            headers: headers,
             responseType: 'json',
           }
         )
@@ -95,12 +102,14 @@ export class MemoryService {
     }
   }
 
-  async ClearAllChatEntry():Promise<void> {
+  async ClearAllChatEntry(csrfToken:string):Promise<void> {
+    const headers = new HttpHeaders().set('X-CSRF-TOKEN', csrfToken);
     try{
       let response:void =  await lastValueFrom(
         this.http.get<void>(
           `${environment.companionUrl}/async/clearAllMemories?cache=${Math.floor(Math.random() * 10000000)}`,
           {
+            headers: headers,
             responseType: 'json',
           }
         )

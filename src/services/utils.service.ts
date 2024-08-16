@@ -3,7 +3,7 @@ import hljs from "highlight.js";
 import {UrlRequest, UrlResponse} from "../models/tts.models";
 import {TtsService} from "./tts.service";
 import {LocalStorageService} from "./local-storage.service";
-import {InputBoxComponent} from "../app/inputbox.component";
+import {InputBoxComponent} from "../app/inputbox/inputbox.component";
 
 const MAX_TOKENS: number = 1000;
 
