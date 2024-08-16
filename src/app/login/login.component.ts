@@ -15,8 +15,8 @@ import {FormsModule} from "@angular/forms";
   standalone: true
 })
 export class LoginComponent {
-  @Input() username: string = "";
-  @Input()password: string = "";
+  username: string = ""
+  password: string = "";
 
   constructor(private loginService: LoginService, private router: Router) {
   }
