@@ -27,7 +27,7 @@ export class OllamaService {
   ) {
   }
 
-  url: string = `${environment.serverUrl}/api`;
+  url: string = `${environment.companionUrl}/api`;
 
   async getModels(): Promise<Array<Model>> {
     //let models:Models = JSON.parse(this.fakeJson);

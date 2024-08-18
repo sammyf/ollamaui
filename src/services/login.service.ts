@@ -27,7 +27,7 @@ export class LoginService {
       return response
     } catch (error) {
       console.error(error);
-      return { result: false, csrfToken: 'No TTS Answer.'};
+      return { result: false, csrf_token: 'No TTS Answer.'};
     }
   }
 }

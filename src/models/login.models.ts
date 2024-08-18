@@ -1,6 +1,6 @@
 export class LoginResult {
   public result:boolean = false;
-  public csrfToken: string = "";
+  public csrf_token: string = "";
 }
 
 export class LoginData {

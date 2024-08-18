@@ -27,14 +27,13 @@ import {UsernamePopupComponent} from "../username-popup/username-popup.component
 import {TtsService} from "../../services/tts.service";
 import {DomSanitizer, SafeHtml, SafeResourceUrl} from '@angular/platform-browser';
 import {runPostSignalSetFn} from "@angular/core/primitives/signals";
-import {Event, Routes} from "@angular/router";
+import {Event, Router, Routes} from "@angular/router";
 import { environment } from '../../environments/environment';
 // Highlighter
 import hljs from 'highlight.js';
 import {Message} from "nx/src/daemon/client/daemon-socket-messenger";
 import {fullChatComponent} from "../full_chat/full_chat.component";
 import {MemoryService} from "../../services/memory.service";
-import { ActivatedRoute } from '@angular/router';
 
 /* TODO :
   * permanent memory
@@ -60,15 +59,12 @@ const routes: Routes = [
 
 export class InputBoxComponent implements AfterViewChecked, OnInit {
   newWindow: Window | null;
-
   url = `${environment.companionUrl}/api`;
   @ViewChild(ChatBoxComponent) ChatBoxReference: ChatBoxComponent | undefined;
   @ViewChild('scrollContainer') private ScrollContainer: ElementRef | undefined;
   @ViewChild('textInput') private textInputElement: ElementRef | undefined;
 
   @ViewChild('TTSPlayer') audioPlayer: ElementRef | undefined;
-
-  @Input() csrfToken: string = "";
 
   // @ts-ignore
   safeUrl: SafeResourceUrl;
@@ -82,11 +78,14 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     speaker: string = "";
   };
 
-  username:string = "";
+  username:string | null = "";
   showUsernamePopup = false;
   previousUsername:string = "";
 
   ttsClip: string = "";
+
+  chatLinesUntilNextContext :number = -1;
+  renewContextAfter: number = 15;
 
   DefaultContext :string = "";
   DefaultPersona :string = "Beezle"
@@ -103,6 +102,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   user_input: string = "";
   system_prompt: string = this.DefaultContext;
 
+  csrfToken:string|null;
   chat_history:Array<Messages> = [];
   chat_memory:Array<Messages> = [];
 
@@ -121,9 +121,17 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
               private ttsService: TtsService,
               private sanitizer: DomSanitizer,
               private cdRef: ChangeDetectorRef,
-              private route: ActivatedRoute
+              private router: Router
   ) {
     this.newWindow = null;
+    this.csrfToken = cookieService.getItem("csrfToken");
+    this.username = cookieService.getItem("username");
+
+    if( (this.csrfToken === "") || (this.csrfToken === undefined) ||
+      (this.username === "") || (this.username === undefined) ) {
+      this.router.navigate(["/login"], {skipLocationChange: true});
+    }
+
     this.chat_history = JSON.parse(<string>localStorage.getItem('chat_history')) ?? new Array<Messages>();
     if(this.chat_memory.length === 0) {
       this.chat_memory = this.chat_history
@@ -154,9 +162,8 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   async ngOnInit() {
     this.showSpinner(true);
-    this.route.params.subscribe(params => {
-      this.csrfToken = params['csrfToken'];
-    });
+
+
     this.model_array = await this.ollamaService.getModels();
 
     let currentModel = await this.ollamaService.GetCurrentModel();
@@ -227,13 +234,15 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       }
       this.username = this.utilService.GetUsername();
       if( this.username !== undefined && this.username !== "" && this.username !== this.previousUsername) {
-        this.SetContext(`You, the AI, are ${this.selectedPersona}. my, the user, name is ${this.username}`);
+        this.SetContext("");
       }
       this.previousUsername = this.username;
-      console.log("this user input:"+this.user_input);
+      if( this.chatLinesUntilNextContext < 0) {
+        this.SetContext("THIS IS A REMINDER!")
+      }
       let expandedUserInput = await this.utilService.ReplaceUrls(this.user_input)
-      console.log("expanded : "+expandedUserInput);
       this.AddToChat({index:this.chat_index, role: "user", content: this.utilService.GetTimeDate()+expandedUserInput, persona:"user"});
+      this.chatLinesUntilNextContext -=1;
       this.localStorage.setItem('chat_history',JSON.stringify(this.chat_history));
 
       if((this.selectedModel === undefined) || (this.selectedModel === "")) {
@@ -260,6 +269,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       let highlightedCode = this.utilService.DoHighlight(this.answer);
 
       this.AddToChat({index:this.chat_index, role: "assistant", content:  highlightedCode, persona: this.selectedPersona});
+      this.chatLinesUntilNextContext -=1;
       let rs = JSON.stringify(this.reverseTruncateHistory(5000))
       this.localStorage.setItem('chat_history', rs);
       this.showSpinner(false);
@@ -271,16 +281,20 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   }
 
   AddToChat(entry:Messages): void {
-    this.memoryService.StoreChatLog(this.csrfToken, entry);
-    this.chat_history.push(entry);
-    this.chat_memory.push(entry);
-    this.chat_index +=1;
-    this.chat_history = this.reverseTruncateHistory( 64000 );
+    console.log("csrfToken : '", this.csrfToken,"'");
+    if(this.csrfToken && this.csrfToken !== "") {
+      this.memoryService.StoreChatLog(this.csrfToken, entry);
+      this.chat_history.push(entry);
+      this.chat_memory.push(entry);
+      this.chat_index += 1;
+      this.chat_history = this.reverseTruncateHistory(64000);
+    } else {
+      this.router.navigate(["/login"], {skipLocationChange: true});
+    }
   }
 
   ShowFullChat() {
-
-    this.newWindow = window.open('/showFullChat', '_blank');
+    this.newWindow = window.open('/chatlog', '_blank');
   }
 
   CheckModelName(model:string):boolean {
@@ -305,10 +319,9 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   SetPersona(contextAdd:string, personaSwitch:boolean) {
     if(personaSwitch) {
-      contextAdd = `** BEEP ** Personality switch happening! ${this.previousSelectedPersona} disappears in a digital puff of magical bytes. YOU are ${this.selectedPersona}, and at your place used to be ${this.previousSelectedPersona}. I, on the other hand, am ${this.username}!  *** BEEP ***\n${contextAdd}`
+      contextAdd = `${this.previousSelectedPersona} disappears in a digital puff of magical bytes and is now absent from and unaware of this chat. ${contextAdd}`
     }
     this.previousSelectedPersona = this.selectedPersona;
-    console.log("selectedPersona: "+this.selectedPersona);
 
     this.currentPersona = this.personas.find(persona => persona.name === this.selectedPersona);
     this.localStorage.setItem("currentPersona", this.selectedPersona);
@@ -316,7 +329,8 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   }
 
   SetContext(contextAdd:string){
-    this.system_prompt = this.currentPersona?.context??this.DefaultContext;
+    this.chatLinesUntilNextContext = this.renewContextAfter
+    this.system_prompt = `${contextAdd}. My, the user, name is ${this.username}. ${this.currentPersona?.context??this.DefaultContext}.You, the AI, are ${this.selectedPersona}.`;
     this.AddToChat({index:this.chat_index, role: "system", content: this.system_prompt, persona: "user"});
   }
 

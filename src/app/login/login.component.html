@@ -1,4 +1,4 @@
-<div class="login-container">
+<div class="login-container" *ngIf="doLogin">
   <form (ngSubmit)="login()">
     <label for="username">Username:</label>
     <input type="text" id="username"  [(ngModel)]="username" [ngModelOptions]="{standalone: true}">

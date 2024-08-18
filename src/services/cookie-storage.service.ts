@@ -6,7 +6,7 @@ import { environment } from '../environments/environment.prod';
   providedIn: 'root',
 })
 export class CookieStorageService {
-  DomainName: string = environment.serverUrl.replace(/^https?:\/\//, '');
+  DomainName: string = window.location.hostname;
 
   constructor() {
   }
@@ -24,7 +24,7 @@ export class CookieStorageService {
       .find((row) => row.startsWith(key + "="))
       ?.split("=")[1];
 
-    return cookieValue ?? "[]";
+    return cookieValue ?? "";
   }
 
   // Remove a value from local storage

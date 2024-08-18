@@ -5,6 +5,8 @@ import {HideUrlSourcePipe} from "../../pipes/hide-url-source.pipe";
 import {Messages} from "../../models/ollama.models";
 import {ChatBoxComponent} from "../chat-box/chat_box.component";
 import {MemoryService} from "../../services/memory.service";
+import {Router} from "@angular/router";
+import {CookieStorageService} from "../../services/cookie-storage.service";
 
 @Component({
   selector: 'full_chat',
@@ -19,11 +21,22 @@ import {MemoryService} from "../../services/memory.service";
 })
 export class fullChatComponent implements OnInit {
   chat_memory: Array<Messages> = [];
-  @Input() csrfToken: string = "";
-  constructor(private  memoryService: MemoryService) {
-
+  csrfToken: string|null = "";
+  constructor(private  memoryService: MemoryService, private cookieStorage: CookieStorageService) {
+    this.csrfToken = cookieStorage.getItem("csrfToken");
+    console.log(this.csrfToken);
   }
   async ngOnInit() {
-    this.chat_memory = await this.memoryService.ReadChatLog(this.csrfToken);
+    if( this.csrfToken !== null ) {
+      this.chat_memory = await this.memoryService.ReadChatLog(this.csrfToken);
+    } else {
+      let msg:Messages = {
+        index: 0,
+        role: 'user',
+        content: 'Not Logged In',
+        persona: 'Not Logged In',
+      }
+      this.chat_memory = [msg]
+    }
   }
 }
