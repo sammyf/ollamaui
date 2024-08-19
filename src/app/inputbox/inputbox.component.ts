@@ -162,7 +162,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   async ngOnInit() {
     this.showSpinner(true);
-
+    await this.memoryService.GenerateMemories(this.csrfToken??"")
 
     this.model_array = await this.ollamaService.getModels();
 
@@ -182,7 +182,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     }
     this.previousModel = this.selectedModel;
 
-    this.previousSelectedPersona = "an personality-less entity";
+    this.previousSelectedPersona = "a personality-less entity";
     this.model = this.GetModel();
     if((this.localStorage.getItem("currentPersona") !== undefined) &&
       (this.localStorage.getItem("currentPersona") !== "") &&
