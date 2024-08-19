@@ -20,7 +20,7 @@ export class MemoryService {
       index: -1,
       persona:msg.persona,
       role:msg.role,
-      content:msg.content
+      content:msg.content.replace(new RegExp(`<LINKED>.*?</LINKED>`, 'g'), '')
     }
     try{
       let response:UrlResponse =  await lastValueFrom(
