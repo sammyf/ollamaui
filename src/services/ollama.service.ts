@@ -119,8 +119,8 @@ export class OllamaService {
     });
 
     try {
-      const modelsData = await lastValueFrom(
-        this.http.get<PsModelsData>(
+      const modelName = await lastValueFrom(
+        this.http.get<string>(
           `${environment.companionUrl}/async/ps?cache=${Math.floor(Math.random() * 10000000)}`,
           {
             responseType: 'json',
@@ -128,10 +128,7 @@ export class OllamaService {
           }
         )
       );
-      if(modelsData.models.length > 0) {
-        return modelsData.models[0].name;
-      }
-      return "None";
+      return modelName;
     } catch (error) {
       console.error(error);
       return "None";

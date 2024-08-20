@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  serverUrl: '',[YOUR SERVER]
+  serverUrl: '',[YOUR SERVER],
   companionUrl: '[YOUR SERVER]'
 };
