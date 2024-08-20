@@ -4,7 +4,7 @@ import {
   Answer,
   LLMAnswer, Messages,
   Model,
-  Models, Prompt, PsModelsData,
+  Models, Prompt,
 } from '../models/ollama.models';
 import {firstValueFrom, lastValueFrom} from 'rxjs';
 import {timeout} from 'rxjs/operators';
