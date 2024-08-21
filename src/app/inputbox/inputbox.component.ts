@@ -132,10 +132,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.router.navigate(["/login"], {skipLocationChange: true});
     }
 
-    this.chat_history = JSON.parse(<string>localStorage.getItem('chat_history')) ?? new Array<Messages>();
-    if(this.chat_memory.length === 0) {
-      this.chat_memory = this.chat_history
-    }
+
     this.personas = personasService.getAllPersonas().sort((a:Persona, b:Persona) => {
       let al= a.name.toLowerCase();
       let bl = b.name.toLowerCase();
@@ -143,11 +140,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       if (al > bl) return 1;
       return 0;
     });
-    if( this.chat_history.length > 0) {
-      this.chat_index = this.chat_history[this.chat_history.length-1].index;
-    }
-    this.AddToChat({index: this.chat_index, role: "system", content: this.system_prompt, persona:"user"});
-    this.chat_memory = this.chat_history
+
   };
 
   model_array: Array<Model> = new Array<Model>();
@@ -194,6 +187,15 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.selectedPersona = this.personas[r].name;
     }
 
+    // this.chat_history = JSON.parse(<string>localStorage.getItem('chat_history')) ?? new Array<Messages>();
+    this.chat_history = await this.memoryService.RetrieveDiscussions(this.csrfToken??"")
+    if(this.chat_memory.length === 0) {
+      this.chat_memory = this.chat_history
+    }    if( this.chat_history.length > 0) {
+      this.chat_index = this.chat_history[this.chat_history.length-1].index;
+    }
+    this.AddToChat({index: this.chat_index, role: "system", content: this.system_prompt, persona:"user"});
+    this.chat_memory = this.chat_history
     // @ts-ignore
     this.model_array = [...this.model_array].sort((a, b) => {
       let al= a.name.toLowerCase();

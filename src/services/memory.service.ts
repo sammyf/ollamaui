@@ -61,7 +61,6 @@ export class MemoryService {
     }
   }
 
-
   async ReadMemories(csrfToken:string):Promise<Array<Memories>> {
     const headers = new HttpHeaders().set('X-CSRF-TOKEN', csrfToken);
     try{
@@ -119,6 +118,26 @@ export class MemoryService {
     } catch (error) {
       console.error(error);
       return;
+    }
+  }
+
+  async RetrieveDiscussions(csrfToken:string):Promise<Array<Messages>> {
+    const headers = new HttpHeaders().set('X-CSRF-TOKEN', csrfToken);
+    try{
+      let response:Array<Messages> =  await lastValueFrom(
+        this.http.get<Array<Messages>>(
+          `${environment.companionUrl}/async/retrieveDiscussion8?cache=${Math.floor(Math.random() * 10000000)}`,
+          {
+            headers: headers,
+            responseType: 'json',
+          }
+        )
+      );
+      // @ts-ignore
+      return response;
+    } catch (error) {
+      console.error(error);
+      return [];
     }
   }
 }
