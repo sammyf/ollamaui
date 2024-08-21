@@ -339,7 +339,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   async SwitchPersonality() {
     this.SetPersona("", true)
-    await this.GetLLMAnswer(`[[The user summoned ${this.currentPersona}!]]`)
+    await this.GetLLMAnswer(`[[The user summoned ${this.selectedModel}!]]`)
   }
 
   SetPersona(contextAdd:string, personaSwitch:boolean) {
