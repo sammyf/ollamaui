@@ -124,8 +124,8 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
               private router: Router
   ) {
     this.newWindow = null;
-    this.csrfToken = cookieService.getItem("csrfToken");
-    this.username = cookieService.getItem("username");
+    this.csrfToken =localStorage.getItem("csrfToken");
+    this.username = localStorage.getItem("username");
 
     if ((this.csrfToken === "") || (this.csrfToken === undefined) ||
       (this.username === "") || (this.username === undefined)) {

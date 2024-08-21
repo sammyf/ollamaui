@@ -7,6 +7,7 @@ import {ChatBoxComponent} from "../chat-box/chat_box.component";
 import {MemoryService} from "../../services/memory.service";
 import {Router} from "@angular/router";
 import {CookieStorageService} from "../../services/cookie-storage.service";
+import {LocalStorageService} from "../../services/local-storage.service";
 
 @Component({
   selector: 'full_chat',
@@ -22,8 +23,8 @@ import {CookieStorageService} from "../../services/cookie-storage.service";
 export class fullChatComponent implements OnInit {
   chat_memory: Array<Messages> = [];
   csrfToken: string|null = "";
-  constructor(private  memoryService: MemoryService, private cookieStorage: CookieStorageService) {
-    this.csrfToken = cookieStorage.getItem("csrfToken");
+  constructor(private  memoryService: MemoryService, private localStorage: LocalStorageService,) {
+    this.csrfToken = localStorage.getItem("csrfToken");
     console.log(this.csrfToken);
   }
   async ngOnInit() {
