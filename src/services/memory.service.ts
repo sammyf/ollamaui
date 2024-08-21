@@ -126,7 +126,7 @@ export class MemoryService {
     try{
       let response:Array<Messages> =  await lastValueFrom(
         this.http.get<Array<Messages>>(
-          `${environment.companionUrl}/async/retrieveDiscussion8?cache=${Math.floor(Math.random() * 10000000)}`,
+          `${environment.companionUrl}/async/retrieveDiscussion?cache=${Math.floor(Math.random() * 10000000)}`,
           {
             headers: headers,
             responseType: 'json',
