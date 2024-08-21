@@ -339,7 +339,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   async SwitchPersonality() {
     this.SetPersona("", true)
-    await this.GetLLMAnswer("[[The user is unaware that someone else entered the room.]]")
+    await this.GetLLMAnswer(`[[The user summoned ${this.currentPersona}!]]`)
   }
 
   SetPersona(contextAdd:string, personaSwitch:boolean) {
