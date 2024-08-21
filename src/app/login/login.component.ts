@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {CommonModule} from "@angular/common";
 import {CookieStorageService} from "../../services/cookie-storage.service";
+import {LocalStorageService} from "../../services/local-storage.service";
 
 @Injectable({providedIn: 'root'})
 @Component({
@@ -23,19 +24,20 @@ export class LoginComponent implements OnInit{
   password: string = "";
   doLogin: boolean = true;
 
-  constructor(private loginService: LoginService, private router: Router, private cookieStorage: CookieStorageService) {
+  constructor(private loginService: LoginService, private router: Router, private localStorage: LocalStorageService) {
   }
 
   ngOnInit(){
-    this.cookieStorage.removeItem("csrfToken");
+
+    this.localStorage.removeItem("csrfToken");
     this.doLogin = true;
   }
   async login() {
     try {
       const data: LoginResult = await this.loginService.Login({ username: this.username, password: this.password});
       if (data.result) {
-        this.cookieStorage.setItem("csrfToken",data.csrf_token);
-        this.cookieStorage.setItem("username", this.username)
+        this.localStorage.setItem("csrfToken",data.csrf_token);
+        this.localStorage.setItem("username", this.username)
         this.doLogin = false;
         this.router.navigate(['/input_box'], {skipLocationChange: true});
       } else {
