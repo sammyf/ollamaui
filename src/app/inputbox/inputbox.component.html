@@ -9,7 +9,7 @@
   <input type="button" [value]="username" class="set_username" (click)="ClearUsername()">
 </div>
 
-<select class="personas" id="personas" [(ngModel)]="selectedPersona">
+<select class="personas" id="personas" [(ngModel)]="selectedPersona" (change)="SwitchPersonality()">
   @for ( p of personas; track p.name) {
     <option [value]="p.name">{{p.name}} : {{p.role}}</option>
   }

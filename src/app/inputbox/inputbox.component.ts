@@ -71,42 +71,42 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   // @ts-ignore
   safeHtml: SafeHtml;
   personas: Array<Persona> = new Array<Persona>();
-  currentPersona: Persona| undefined = new class implements Persona {
+  currentPersona: Persona | undefined = new class implements Persona {
     context: string = "";
     name: string = "";
-    role: string= "";
+    role: string = "";
     speaker: string = "";
   };
 
-  username:string | null = "";
+  username: string | null = "";
   showUsernamePopup = false;
-  previousUsername:string = "";
+  previousUsername: string = "";
 
   ttsClip: string = "";
 
-  chatLinesUntilNextContext :number = -1;
+  chatLinesUntilNextContext: number = -1;
   renewContextAfter: number = 15;
 
-  DefaultContext :string = "";
-  DefaultPersona :string = "Beezle"
+  DefaultContext: string = "";
+  DefaultPersona: string = "Beezle"
   DefaultModel: string = "gemma2:2b";
 
-  selectedModel:string = this.DefaultModel;
-  previousModel:string = this.selectedModel;
-  model:Model | undefined = undefined;
-  selectedPersona:string = this.DefaultModel;
-  spinnerState:boolean = true;
+  selectedModel: string = this.DefaultModel;
+  previousModel: string = this.selectedModel;
+  model: Model | undefined = undefined;
+  selectedPersona: string = this.DefaultModel;
+  spinnerState: boolean = true;
 
-  previousSelectedPersona:string = "";
+  previousSelectedPersona: string = "";
   answer = "";
   user_input: string = "";
   system_prompt: string = this.DefaultContext;
 
-  csrfToken:string|null;
-  chat_history:Array<Messages> = [];
-  chat_memory:Array<Messages> = [];
+  csrfToken: string | null;
+  chat_history: Array<Messages> = [];
+  chat_memory: Array<Messages> = [];
 
-  chat_index:number = 0;
+  chat_index: number = 0;
   showFullChatToggle: boolean = false;
 
   constructor(private http: HttpClient,
@@ -127,14 +127,14 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     this.csrfToken = cookieService.getItem("csrfToken");
     this.username = cookieService.getItem("username");
 
-    if( (this.csrfToken === "") || (this.csrfToken === undefined) ||
-      (this.username === "") || (this.username === undefined) ) {
+    if ((this.csrfToken === "") || (this.csrfToken === undefined) ||
+      (this.username === "") || (this.username === undefined)) {
       this.router.navigate(["/login"], {skipLocationChange: true});
     }
 
 
-    this.personas = personasService.getAllPersonas().sort((a:Persona, b:Persona) => {
-      let al= a.name.toLowerCase();
+    this.personas = personasService.getAllPersonas().sort((a: Persona, b: Persona) => {
+      let al = a.name.toLowerCase();
       let bl = b.name.toLowerCase();
       if (al < bl) return -1;
       if (al > bl) return 1;
@@ -145,7 +145,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   model_array: Array<Model> = new Array<Model>();
 
-  private showSpinner(onoff:boolean) {
+  private showSpinner(onoff: boolean) {
     this.spinnerState = onoff;
     if (!onoff) {
       // @ts-ignore
@@ -155,32 +155,32 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   async ngOnInit() {
     this.showSpinner(true);
-    await this.memoryService.GenerateMemories(this.csrfToken??"")
+    await this.memoryService.GenerateMemories(this.csrfToken ?? "")
 
     this.model_array = await this.ollamaService.getModels();
 
     let currentModel = await this.ollamaService.GetCurrentModel();
 
-    if(currentModel === "None") {
+    if (currentModel === "None") {
       if ((this.localStorage.getItem("currentModel") !== undefined) &&
         (this.localStorage.getItem("currentModel") !== "") &&
-        (this.CheckModelName(this.localStorage.getItem("currentModel")??"None"))) {
+        (this.CheckModelName(this.localStorage.getItem("currentModel") ?? "None"))) {
         this.selectedModel = this.localStorage.getItem("currentModel") ?? "";
       } else {
         let r: number = Math.floor(Math.random() * this.model_array.length);
         this.selectedModel = this.model_array[r].name;
       }
-    }  else {
-      this.selectedModel=currentModel
+    } else {
+      this.selectedModel = currentModel
     }
     this.previousModel = this.selectedModel;
 
     this.previousSelectedPersona = "a personality-less entity";
     this.model = this.GetModel();
-    if((this.localStorage.getItem("currentPersona") !== undefined) &&
+    if ((this.localStorage.getItem("currentPersona") !== undefined) &&
       (this.localStorage.getItem("currentPersona") !== "") &&
-      (this.CheckPersonaName(this.localStorage.getItem("currentPersona")??"None")) ) {
-      console.log("stored persona"+this.localStorage.getItem("currentPersona"));
+      (this.CheckPersonaName(this.localStorage.getItem("currentPersona") ?? "None"))) {
+      console.log("stored persona" + this.localStorage.getItem("currentPersona"));
       this.selectedPersona = this.localStorage.getItem("currentPersona") ?? "";
     } else {
       let r: number = Math.floor(Math.random() * this.personas.length);
@@ -188,17 +188,18 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     }
 
     // this.chat_history = JSON.parse(<string>localStorage.getItem('chat_history')) ?? new Array<Messages>();
-    this.chat_history = await this.memoryService.RetrieveDiscussions(this.csrfToken??"")
-    if(this.chat_memory.length === 0) {
+    this.chat_history = await this.memoryService.RetrieveDiscussions(this.csrfToken ?? "")
+    if (this.chat_memory.length === 0) {
       this.chat_memory = this.chat_history
-    }    if( this.chat_history.length > 0) {
-      this.chat_index = this.chat_history[this.chat_history.length-1].index;
     }
-    this.AddToChat({index: this.chat_index, role: "system", content: this.system_prompt, persona:"user"});
+    if (this.chat_history.length > 0) {
+      this.chat_index = this.chat_history[this.chat_history.length - 1].index;
+    }
+    this.AddToChat({index: this.chat_index, role: "system", content: this.system_prompt, persona: "user"});
     this.chat_memory = this.chat_history
     // @ts-ignore
     this.model_array = [...this.model_array].sort((a, b) => {
-      let al= a.name.toLowerCase();
+      let al = a.name.toLowerCase();
       let bl = b.name.toLowerCase();
       if (al < bl) return -1;
       if (al > bl) return 1;
@@ -206,10 +207,10 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     });
 
     this.username = this.localStorage.getItem("username") ?? "not set";
-    let volume:number = 0.5;
+    let volume: number = 0.5;
     try {
-      volume = parseFloat(this.localStorage.getItem("volume")??"0.5");
-    } catch(error) {
+      volume = parseFloat(this.localStorage.getItem("volume") ?? "0.5");
+    } catch (error) {
       volume = 0.5
     }
 
@@ -224,69 +225,83 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   async KeyUp(e: KeyboardEvent) {
     // console.log(this.user_input)
     if (e.key === 'Enter' && !e.shiftKey) {
-      this.showSpinner(true);
-      this.username = this.utilService.GetUsername();
-      if(this.previousSelectedPersona === "" || this.previousSelectedPersona === undefined) {
-        this.previousSelectedPersona = this.selectedPersona;
-        this.SetPersona(`You are ${this.selectedPersona}`,false);
-      } else if(this.selectedPersona !== this.previousSelectedPersona){
-        this.SetPersona('', true);
-        this.previousSelectedPersona = this.selectedPersona;
-        //this.chat_history = new Array<Messages>();
-      }
-      this.username = this.utilService.GetUsername();
-      if( this.username !== undefined && this.username !== "" && this.username !== this.previousUsername) {
-        this.SetContext("");
-      }
-      this.previousUsername = this.username;
-      if( this.chatLinesUntilNextContext < 0) {
-        this.SetContext("THIS IS A REMINDER!")
-      }
-      let expandedUserInput = await this.utilService.ReplaceUrls(this.user_input)
-      this.AddToChat({index:this.chat_index, role: "user", content: this.utilService.GetTimeDate()+expandedUserInput, persona:"user"});
-      this.chatLinesUntilNextContext -=1;
-      this.localStorage.setItem('chat_history',JSON.stringify(this.chat_history));
-
-      if((this.selectedModel === undefined) || (this.selectedModel === "")) {
-        let r: number = Math.floor(Math.random() * this.model_array.length);
-        this.selectedModel = this.model_array[r].name;
-      }
-      if(this.selectedModel !== this.previousModel) {
-        if( this.previousModel != "") {
-          this.ollamaService.UnloadModel(this.previousModel);
-        }
-        this.previousModel = this.selectedModel;
-      }
-      this.localStorage.setItem("currentModel",this.selectedModel);
-      this.model = this.GetModel();
-      let postData: Prompt = {
-        "model": this.selectedModel,
-        "stream": false,
-        "temperature": 1.31,
-        "messages": this.chat_history,
-        "keep_alive": -1
-      };
-      this.user_input = "";
-      this.answer = await this.ollamaService.sendRequest({postData: postData})??"Something went wrong.";
-      this.ttsClip = await this.ttsService.getTTS(this.answer, this.currentPersona?.speaker??"p243");
-      this.updateAudioSource();
-      let highlightedCode = this.utilService.DoHighlight(this.answer);
-
-      this.AddToChat({index:this.chat_index, role: "assistant", content:  highlightedCode, persona: this.selectedPersona});
-      this.chatLinesUntilNextContext -=1;
-      let rs = JSON.stringify(this.reverseTruncateHistory(5000))
-      this.localStorage.setItem('chat_history', rs);
-      this.showSpinner(false);
+      await this.GetLLMAnswer(this.user_input);
     }
   }
 
-  GetModel():Model|undefined {
+  async GetLLMAnswer(input: string) {
+    this.showSpinner(true);
+    this.username = this.utilService.GetUsername();
+    if (this.previousSelectedPersona === "" || this.previousSelectedPersona === undefined) {
+      this.previousSelectedPersona = this.selectedPersona;
+      this.SetPersona(`You are ${this.selectedPersona}`, false);
+    } else if (this.selectedPersona !== this.previousSelectedPersona) {
+      this.SetPersona('', true);
+      this.previousSelectedPersona = this.selectedPersona;
+      //this.chat_history = new Array<Messages>();
+    }
+    this.username = this.utilService.GetUsername();
+    if (this.username !== undefined && this.username !== "" && this.username !== this.previousUsername) {
+      this.SetContext("");
+    }
+    this.previousUsername = this.username;
+    if (this.chatLinesUntilNextContext < 0) {
+      this.SetContext("THIS IS A REMINDER!")
+    }
+    let expandedUserInput = await this.utilService.ReplaceUrls(input)
+    this.AddToChat({
+      index: this.chat_index,
+      role: "user",
+      content: this.utilService.GetTimeDate() + expandedUserInput,
+      persona: "user"
+    });
+    this.chatLinesUntilNextContext -= 1;
+    this.localStorage.setItem('chat_history', JSON.stringify(this.chat_history));
+
+    if ((this.selectedModel === undefined) || (this.selectedModel === "")) {
+      let r: number = Math.floor(Math.random() * this.model_array.length);
+      this.selectedModel = this.model_array[r].name;
+    }
+    if (this.selectedModel !== this.previousModel) {
+      if (this.previousModel != "") {
+        this.ollamaService.UnloadModel(this.previousModel);
+      }
+      this.previousModel = this.selectedModel;
+    }
+    this.localStorage.setItem("currentModel", this.selectedModel);
+    this.model = this.GetModel();
+    let postData: Prompt = {
+      "model": this.selectedModel,
+      "stream": false,
+      "temperature": 1.31,
+      "messages": this.chat_history,
+      "keep_alive": -1
+    };
+    this.user_input = "";
+    this.answer = await this.ollamaService.sendRequest({postData: postData}) ?? "Something went wrong.";
+    this.ttsClip = await this.ttsService.getTTS(this.answer, this.currentPersona?.speaker ?? "p243");
+    this.updateAudioSource();
+    let highlightedCode = this.utilService.DoHighlight(this.answer);
+
+    this.AddToChat({
+      index: this.chat_index,
+      role: "assistant",
+      content: highlightedCode,
+      persona: this.selectedPersona
+    });
+    this.chatLinesUntilNextContext -= 1;
+    let rs = JSON.stringify(this.reverseTruncateHistory(5000))
+    this.localStorage.setItem('chat_history', rs);
+    this.showSpinner(false);
+  }
+
+  GetModel(): Model | undefined {
     return this.model_array.find(model => model.name === this.selectedModel);
   }
 
-  AddToChat(entry:Messages): void {
-    console.log("csrfToken : '", this.csrfToken,"'");
-    if(this.csrfToken && this.csrfToken !== "") {
+  AddToChat(entry: Messages): void {
+    console.log("csrfToken : '", this.csrfToken, "'");
+    if (this.csrfToken && this.csrfToken !== "") {
       this.memoryService.StoreChatLog(this.csrfToken, entry);
       this.chat_history.push(entry);
       this.chat_memory.push(entry);
@@ -301,7 +316,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     this.newWindow = window.open('/chatlog', '_blank');
   }
 
-  CheckModelName(model:string):boolean {
+  CheckModelName(model: string): boolean {
     if (model) {
       let exists = this.model_array.some(item => item.name === model);
       if (exists) {
@@ -311,7 +326,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     return false;
   }
 
-  CheckPersonaName(name:string):boolean {
+  CheckPersonaName(name: string): boolean {
     if (name) {
       let exists = this.personas.some(item => item.name === name);
       if (exists) {
@@ -319,6 +334,12 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       }
     }
     return false;
+  }
+
+
+  async SwitchPersonality() {
+    this.SetPersona("", true)
+    await this.GetLLMAnswer("[[The user is unaware that someone else entered the room.]]")
   }
 
   SetPersona(contextAdd:string, personaSwitch:boolean) {
