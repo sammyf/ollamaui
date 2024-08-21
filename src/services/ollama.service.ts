@@ -47,6 +47,10 @@ export class OllamaService {
           }
         )
       );
+      let modelNamesToIgnore: string[] = ["bakllava", "llava", "moondream"];
+      models.models = models.models.filter(model => {
+        return !modelNamesToIgnore.some(igName => model.name.includes(igName));
+      });
       return models.models;
     } catch (error) {
       console.error(error);
