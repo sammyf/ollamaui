@@ -285,6 +285,22 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     };
     this.user_input = "";
     this.answer = await this.ollamaService.sendRequest({postData: postData}) ?? "Something went wrong.";
+// check if answer starts with "::fetch"
+    if (this.answer.toLowerCase().startsWith("::fetch")) {
+      // remove the "::fetch" prefix, trim spaces, and get the url
+      const url = this.answer.replace("::fetch", "").trim();
+
+      // Use a regular expression to check if the remaining string is a URL
+      const urlRegEx = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+
+      if (urlRegEx.test(url)) {
+        // Call the RetrieveURLs function in the utils
+        let prompt = await this.utilService.ReplaceUrls(url);
+        this.GetLLMAnswer(url)
+        return
+      }
+    }
+
     this.ttsClip = await this.ttsService.getTTS(this.answer, this.currentPersona?.speaker ?? "p243");
     this.updateAudioSource();
     let highlightedCode = this.utilService.DoHighlight(this.answer);
