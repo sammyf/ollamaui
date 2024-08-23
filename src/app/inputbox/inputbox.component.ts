@@ -198,12 +198,18 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     this.AddToChat({index: this.chat_index, role: "system", content: this.system_prompt, persona: "user"});
     this.chat_memory = this.chat_history
     // @ts-ignore
-    this.model_array = [...this.model_array].sort((a, b) => {
-      let al = a.name.toLowerCase();
-      let bl = b.name.toLowerCase();
-      if (al < bl) return -1;
-      if (al > bl) return 1;
-      return 0;
+    this.model_array.sort((a, b) => {
+      if (a.details.parameter_size === b.details.parameter_size) {
+        // If parameter_size are equal then sort by name
+        // localeCompare is String method that returns a number indicating whether a reference string comes before,
+        // or after or is the same as the given string in sort order.
+        return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+      } else {
+        let aSize = parseFloat(a.details.parameter_size.replace('B',''));
+        let bSize = parseFloat(b.details.parameter_size.replace('B',''));
+        // If parameter_size are not equal then sort by parameter_size
+        return aSize - bSize;
+      }
     });
 
     this.username = this.localStorage.getItem("username") ?? "not set";
