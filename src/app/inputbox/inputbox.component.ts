@@ -101,7 +101,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   answer = "";
   user_input: string = "";
   system_prompt: string = this.DefaultContext;
-
+  system_tools: string = "You equipped to fetch content from URLs based on specific triggers. When prompted with '::fetch {URL}' or '::geturl {URL};' without further commentary, the system will autonomously retrieve the webpage content and provide it for analysis."
   csrfToken: string | null;
   chat_history: Array<Messages> = [];
   chat_memory: Array<Messages> = [];
@@ -195,7 +195,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     if (this.chat_history.length > 0) {
       this.chat_index = this.chat_history[this.chat_history.length - 1].index;
     }
-    this.AddToChat({index: this.chat_index, role: "system", content: this.system_prompt, persona: "user"});
+    this.AddToChat({index: this.chat_index, role: "system", content: this.system_prompt+this.system_tools, persona: "user"});
     this.chat_memory = this.chat_history
     // @ts-ignore
     this.model_array.sort((a, b) => {
