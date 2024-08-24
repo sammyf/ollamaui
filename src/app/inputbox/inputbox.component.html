@@ -1,7 +1,6 @@
 <select class="models" id="models" [(ngModel)]="selectedModel">
-  @for ( model of model_array; track model.digest) {
-    <option [value]="model.name">{{model.name}} ({{model.details.parameter_size}} / {{model.details.quantization_level}})</option>
-  }
+  <option *ngFor='let model of model_array' [value]="model.name">{{model.name}} ({{model.details.parameter_size}} / {{model.details.quantization_level}})</option>
+
 </select>
 
 <div class="set_username">

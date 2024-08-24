@@ -104,7 +104,8 @@ export class Prompt {
     public stream: boolean = false,
     public temperature: number = 1.31,
     public messages: Array<Messages> = new Array<Messages>(),
-    public keep_alive: number = 0
+    public keep_alive: number = 0,
+    public num_ctx: number = 64000,
   ) {
     this.model = model;
     this.stream = stream;

@@ -91,7 +91,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   DefaultPersona: string = "Beezle"
   DefaultModel: string = "gemma2:2b";
 
-  selectedModel: string = this.DefaultModel;
+  selectedModel: string = "None";
   previousModel: string = this.selectedModel;
   model: Model | undefined = undefined;
   selectedPersona: string = this.DefaultModel;
@@ -157,23 +157,27 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     this.showSpinner(true);
     await this.memoryService.GenerateMemories(this.csrfToken ?? "")
 
-    this.model_array = await this.ollamaService.getModels();
 
     let currentModel = await this.ollamaService.GetCurrentModel();
-
-    if (currentModel === "None") {
-      if ((this.localStorage.getItem("currentModel") !== undefined) &&
-        (this.localStorage.getItem("currentModel") !== "") &&
-        (this.CheckModelName(this.localStorage.getItem("currentModel") ?? "None"))) {
-        this.selectedModel = this.localStorage.getItem("currentModel") ?? "";
-      } else {
-        let r: number = Math.floor(Math.random() * this.model_array.length);
-        this.selectedModel = this.model_array[r].name;
-      }
-    } else {
+    if( currentModel !== "None" ) {
       this.selectedModel = currentModel
     }
+    console.log("Current Model : "+currentModel);
+
+    if ((this.localStorage.getItem("currentModel") !== undefined) &&
+      (this.localStorage.getItem("currentModel") !== "") &&
+      (this.CheckModelName(this.localStorage.getItem("currentModel") ?? "None"))) {
+      console.log("+++++++++++++++++++++  A");
+      this.selectedModel = this.localStorage.getItem("currentModel") ?? "";
+    }
+    if( this.selectedModel === "None" ) {
+      console.log("+++++++++++++++++++++  B");
+      this.model_array = await this.ollamaService.getModels();
+      let r: number = Math.floor(Math.random() * this.model_array.length);
+      this.selectedModel = this.model_array[r].name;
+    }
     this.previousModel = this.selectedModel;
+    this.model_array = await this.ollamaService.getModels();
 
     this.previousSelectedPersona = "a personality-less entity";
     this.model = this.GetModel();
@@ -281,26 +285,37 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       "stream": false,
       "temperature": 1.31,
       "messages": this.chat_history,
-      "keep_alive": -1
+      "keep_alive": -1,
+      "num_ctx": 64000
     };
     this.user_input = "";
     this.answer = await this.ollamaService.sendRequest({postData: postData}) ?? "Something went wrong.";
-// check if answer starts with "::fetch"
-    if (this.answer.toLowerCase().startsWith("::fetch")) {
-      // remove the "::fetch" prefix, trim spaces, and get the url
-      const url = this.answer.replace("::fetch", "").trim();
+    console.log("\n\n\n----------- FETCHING URL\n")
+    // check if answer starts with "::fetch"
+    // Regular expression to check for ::fetch followed by a URL
+    const fetchRegEx = /::fetch\s*((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/(\w#!:.?\+=&%@!\-\/\]])])?)/i;
 
-      // Use a regular expression to check if the remaining string is a URL
-      const urlRegEx = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+    // Check the answer for the fetch command followed by a URL
+    let match = this.answer.match(fetchRegEx);
 
-      if (urlRegEx.test(url)) {
-        // Call the RetrieveURLs function in the utils
-        let prompt = await this.utilService.ReplaceUrls(url);
-        this.GetLLMAnswer(url)
-        return
-      }
+    if (match) {
+      await this.DisplayLLMAnswer()
+      // Get the URL which is the string following "::fetch "
+      const url = match[1].trim().replace(/['"`´]/g, "");
+      console.log("URL : §§ "+url+" §§")
+      // Call the RetrieveURLs function in the utils
+      let prompt = await this.utilService.ReplaceUrls(url);
+      await this.GetLLMAnswer(url)
+      return
     }
 
+    await this.DisplayLLMAnswer()
+    let rs = JSON.stringify(this.reverseTruncateHistory(5000))
+    this.localStorage.setItem('chat_history', rs);
+    this.showSpinner(false);
+  }
+
+  async DisplayLLMAnswer() {
     this.ttsClip = await this.ttsService.getTTS(this.answer, this.currentPersona?.speaker ?? "p243");
     this.updateAudioSource();
     let highlightedCode = this.utilService.DoHighlight(this.answer);
@@ -312,9 +327,6 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       persona: this.selectedPersona
     });
     this.chatLinesUntilNextContext -= 1;
-    let rs = JSON.stringify(this.reverseTruncateHistory(5000))
-    this.localStorage.setItem('chat_history', rs);
-    this.showSpinner(false);
   }
 
   GetModel(): Model | undefined {
