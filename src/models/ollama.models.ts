@@ -44,6 +44,10 @@ export interface Model {
   details: ModelDetails;
 }
 
+export interface CurrentModel {
+  model: string;
+}
+
 export interface Models {
   models: Array<Model>;
 }

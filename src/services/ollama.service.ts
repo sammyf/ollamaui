@@ -1,7 +1,7 @@
 import {Injectable, model, NgModule, Renderer2} from '@angular/core';
 import {HttpClient, HttpClientModule, HttpHeaders, provideHttpClient, withInterceptors} from '@angular/common/http';
 import {
-  Answer,
+  Answer, CurrentModel,
   LLMAnswer, Messages,
   Model,
   Models, Prompt,
@@ -123,8 +123,8 @@ export class OllamaService {
     });
 
     try {
-      const modelName = await lastValueFrom(
-        this.http.get<string>(
+      const modelName:CurrentModel = await lastValueFrom(
+        this.http.get<CurrentModel>(
           `${environment.companionUrl}/async/ps?cache=${Math.floor(Math.random() * 10000000)}`,
           {
             responseType: 'json',
@@ -132,7 +132,7 @@ export class OllamaService {
           }
         )
       );
-      return modelName;
+      return modelName.model;
     } catch (error) {
       console.error(error);
       return "None";
