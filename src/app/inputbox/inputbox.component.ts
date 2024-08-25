@@ -101,7 +101,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   answer = "";
   user_input: string = "";
   system_prompt: string = this.DefaultContext;
-  system_tools: string = "You equipped to fetch content from URLs based on specific triggers. When prompted with '::fetch {URL}' without further commentary, the system will autonomously retrieve the webpage content and provide it for analysis."
+  system_tools: string = "The `::fetch` tool is now enabled for autonomous use. Simply type ::fetch followed by the desired URL (without any brackets or quotes) to fetch webpage content. I'll take care of retrieving the information for you."
   csrfToken: string | null;
   chat_history: Array<Messages> = [];
   chat_memory: Array<Messages> = [];
@@ -304,8 +304,9 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       const url = match[1].trim().replace(/['"`´]/g, "");
       console.log("URL : §§ "+url+" §§")
       // Call the RetrieveURLs function in the utils
-      let prompt = await this.utilService.ReplaceUrls(url);
-      await this.GetLLMAnswer(url)
+      let urlContent = await this.utilService.ReplaceUrls(url);
+      let prompt = "here is the content of the URL you requested : ${urlContent}\n"
+      await this.GetLLMAnswer(prompt)
       return
     }
 
