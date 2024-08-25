@@ -305,7 +305,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       console.log("URL : §§ "+url+" §§")
       // Call the RetrieveURLs function in the utils
       let urlContent = await this.utilService.ReplaceUrls(url);
-      let prompt = "here is the content of the URL you requested : ${urlContent}\n"
+      let prompt = `Here is the content of the URL you requested : ${urlContent}\n`
       await this.GetLLMAnswer(prompt)
       return
     }
