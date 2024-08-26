@@ -4,6 +4,10 @@ import {UrlRequest, UrlResponse} from "../models/tts.models";
 import {TtsService} from "./tts.service";
 import {LocalStorageService} from "./local-storage.service";
 import {InputBoxComponent} from "../app/inputbox/inputbox.component";
+import {lastValueFrom} from "rxjs";
+import {environment} from "../environments/environment.prod";
+import {HttpClient} from "@angular/common/http";
+import {QueryRequest} from "../models/ollama.models";
 
 const MAX_TOKENS: number = 1000;
 
@@ -12,7 +16,7 @@ const MAX_TOKENS: number = 1000;
 })
 export class UtilsService {
 
-  constructor(private ttsService: TtsService,
+  constructor(private http: HttpClient,
               private localStorage: LocalStorageService,) {
   }
 
@@ -54,6 +58,85 @@ export class UtilsService {
 
   // Internet Connection
   //
+  async  LookForCommands(text:string):Promise<string> {
+
+    // Regular expression to check for ::fetch followed by a URL
+    const fetchRegEx = /::fetch\s*((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/(\w#!:.?\+=&%@!\-\/\]])])?)/i;
+    let match = text.match(fetchRegEx);
+    if (match) {
+      // Get the URL which is the string following "::fetch "
+      const url = match[1].trim().replace(/['"`´]/g, "");
+      console.log("URL : §§ "+url+" §§")
+      // Call the RetrieveURLs function
+      let urlContent = await this.ReplaceUrls(url);
+      let prompt = `Here is the content of the URL you requested : ${urlContent}\n`
+      return prompt
+    }
+
+    // Regular expression to check for ::fetch followed by a URL
+    const searchRegEx = /::search\s*`(.+?)`/i;
+    match = text.match(fetchRegEx);
+    if (match) {
+      // Get the URL which is the string following "::fetch "
+      const query = match[1].trim();
+      // Call the CallSearx function
+      let results = await this.CallSearx(query);
+      let prompt = `Here are the results of the search for "${query}" you requested.\n<LINKED>${results}</LINKED>\n`
+      return prompt
+    }
+    return ""
+  }
+
+  async  CallSearx(query:string):Promise<string> {
+    let queryRequest:QueryRequest = {
+      query:query
+    }
+    try{
+      let response:UrlResponse =  await lastValueFrom(
+        this.http.post<UrlResponse>(
+          `${environment.companionUrl}/async/search?cache=${Math.floor(Math.random() * 10000000)}`,
+          queryRequest,
+          {
+            responseType: 'json',
+          }
+        )
+      );
+      // @ts-ignore
+      return response.content;
+    } catch (error) {
+      console.error(error);
+      let rs = new UrlResponse();
+      rs.content = "An error occurred while fetching url.";
+      rs.returnCode = 500;
+      return "";
+    }
+  }
+
+  async  fetchUrl(text:string):Promise<UrlResponse> {
+    let urlRequest:UrlRequest = {
+      url:text
+    }
+    try{
+      let response:UrlResponse =  await lastValueFrom(
+        this.http.post<UrlResponse>(
+          `${environment.companionUrl}/companion/spider?cache=${Math.floor(Math.random() * 10000000)}`,
+          urlRequest,
+          {
+            responseType: 'json',
+          }
+        )
+      );
+      // @ts-ignore
+      return response;
+    } catch (error) {
+      console.error(error);
+      let rs = new UrlResponse();
+      rs.content = "An error occurred while fetching url.";
+      rs.returnCode = 500;
+      return rs;
+    }
+  }
+
   async ReplaceUrls(source:string):Promise<string> {
     let urlRegex: RegExp = /(https?:\/\/[^\s]+)/gi; // This is a regular expression that matches URLs.
     let result: UrlResponse;
@@ -62,7 +145,7 @@ export class UtilsService {
     for (let match of urls) {
       let url = match[1];
       console.log(`matched URL : =${url}`);
-      let body = await this.ttsService.fetchUrl(url);
+      let body = await this.fetchUrl(url);
       let content = this.TruncateToTokens(body.content,MAX_TOKENS)
       let result = ` ( url:"${url}",  ReturnCode:${body.returnCode} )<LINKED>${content}</LINKED>`;
       source = source.replace(url, result);

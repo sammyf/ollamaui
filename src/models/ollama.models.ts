@@ -119,3 +119,7 @@ export class Memories {
   public date:Date = new Date();
   public content: string = "";
 }
+
+export class QueryRequest {
+  query:string = "";
+}

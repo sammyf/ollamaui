@@ -11,6 +11,10 @@ export class UrlRequest {
   public url: string = "";
 }
 
+export class QueryResponse {
+  public query: string = "";
+}
+
 export class UrlResponse {
   public content: string = "";
   public returnCode: number = 200;

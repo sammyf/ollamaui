@@ -35,29 +35,4 @@ export class TtsService {
       return 'No TTS Answer.';
     }
   }
-
-  async  fetchUrl(text:string):Promise<UrlResponse> {
-    let urlRequest:UrlRequest = {
-      url:text
-    }
-    try{
-      let response:UrlResponse =  await lastValueFrom(
-        this.http.post<UrlResponse>(
-          `${environment.companionUrl}/companion/spider?cache=${Math.floor(Math.random() * 10000000)}`,
-          urlRequest,
-          {
-            responseType: 'json',
-          }
-        )
-      );
-      // @ts-ignore
-      return response;
-    } catch (error) {
-      console.error(error);
-      let rs = new UrlResponse();
-      rs.content = "An error occurred while fetching url.";
-      rs.returnCode = 500;
-      return rs;
-    }
-  }
 }

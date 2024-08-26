@@ -290,23 +290,10 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     };
     this.user_input = "";
     this.answer = await this.ollamaService.sendRequest({postData: postData}) ?? "Something went wrong.";
-    console.log("\n\n\n----------- FETCHING URL\n")
-    // check if answer starts with "::fetch"
-    // Regular expression to check for ::fetch followed by a URL
-    const fetchRegEx = /::fetch\s*((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/(\w#!:.?\+=&%@!\-\/\]])])?)/i;
-
-    // Check the answer for the fetch command followed by a URL
-    let match = this.answer.match(fetchRegEx);
-
-    if (match) {
+    let cmd = await this.utilService.LookForCommands(this.answer)
+    if (cmd !== "") {
       await this.DisplayLLMAnswer()
-      // Get the URL which is the string following "::fetch "
-      const url = match[1].trim().replace(/['"`´]/g, "");
-      console.log("URL : §§ "+url+" §§")
-      // Call the RetrieveURLs function in the utils
-      let urlContent = await this.utilService.ReplaceUrls(url);
-      let prompt = `Here is the content of the URL you requested : ${urlContent}\n`
-      await this.GetLLMAnswer(prompt)
+      await this.GetLLMAnswer(cmd)
       return
     }
 
