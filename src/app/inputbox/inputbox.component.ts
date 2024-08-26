@@ -101,7 +101,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   answer = "";
   user_input: string = "";
   system_prompt: string = this.DefaultContext;
-  system_tools: string = "The `::fetch` tool is now enabled for autonomous use. Simply type ::fetch followed by the desired URL (without any brackets or quotes) to fetch webpage content. I'll take care of retrieving the information for you."
+  system_tools: string = ""
   csrfToken: string | null;
   chat_history: Array<Messages> = [];
   chat_memory: Array<Messages> = [];
@@ -126,6 +126,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     this.newWindow = null;
     this.csrfToken =localStorage.getItem("csrfToken");
     this.username = localStorage.getItem("username");
+    this.system_tools = utilService.GetCommandPrompt();
 
     if ((this.csrfToken === "") || (this.csrfToken === undefined) ||
       (this.username === "") || (this.username === undefined)) {

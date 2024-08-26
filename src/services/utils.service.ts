@@ -56,10 +56,17 @@ export class UtilsService {
     return originalAnswer;
   }
 
-  // Internet Connection
+  // Commands and Internet Connection
   //
+  GetCommandPrompt():string {
+    let tools = "These tools are available to you. You can use them autonomously without any intervention by the User :\n";
+    let fetch ="**::fetch** : The `::fetch` tool is now enabled for autonomous use. Simply type ::fetch followed by the desired URL (without any brackets or quotes) to fetch webpage content. I'll take care of retrieving the information for you.\n";
+    let search="**::search** : This tool allows you to search the internet using your favorite search engine, just like you would on a web browser." +
+      "To use the ::search tool, simply type `::search` followed by the query you want to search for, enclosed in backticks (`). For example, if you wanted to search for information about 'LLM' and 'Code Companion', you would type ::search `LLM Code Companion`" +
+      "The `::search` tool is a powerful way to explore the internet and find answers to your questions. Just remember to enclose your query in backticks (`) and you're good to go!\n";
+    return tools+fetch+search;
+  }
   async  LookForCommands(text:string):Promise<string> {
-
     // Regular expression to check for ::fetch followed by a URL
     const fetchRegEx = /::fetch\s*((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/(\w#!:.?\+=&%@!\-\/\]])])?)/i;
     let match = text.match(fetchRegEx);
