@@ -77,7 +77,7 @@ export class UtilsService {
       console.log("URL : §§ "+url+" §§")
       // Call the RetrieveURLs function
       let urlContent = await this.ReplaceUrls(url);
-      let prompt = `Here is the content of the URL you requested : ${urlContent}\n`
+      let prompt = `Here is the content of the URL you requested : ${urlContent}. Feel free to ::fetch any URL which sounds like it might help fill in details.\n`
       return prompt
     }
 
@@ -89,7 +89,7 @@ export class UtilsService {
       const query = match[1].trim();
       // Call the CallSearx function
       let results = await this.CallSearx(query);
-      let prompt = `Here are the results of the search for "${query}" you requested.\n<LINKED>${results}</LINKED>. Feel free to ::fetch any URL which sounds like it might help answer the question or fill in details.\n`
+      let prompt = `Here are the results of the search for "${query}" you requested.\n<LINKED>${results}</LINKED>. Feel free to ::fetch any URL which sounds like it might help fill in details.\n`
       return prompt
     }
     return ""
@@ -127,7 +127,7 @@ export class UtilsService {
     try{
       let response:UrlResponse =  await lastValueFrom(
         this.http.post<UrlResponse>(
-          `${environment.companionUrl}/companion/spider?cache=${Math.floor(Math.random() * 10000000)}`,
+          `${environment.companionUrl}/async/fetch?cache=${Math.floor(Math.random() * 10000000)}`,
           urlRequest,
           {
             responseType: 'json',
