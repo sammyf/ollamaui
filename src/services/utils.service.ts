@@ -89,7 +89,7 @@ export class UtilsService {
       const query = match[1].trim();
       // Call the CallSearx function
       let results = await this.CallSearx(query);
-      let prompt = `Here are the results of the search for "${query}" you requested.\n<LINKED>${results}</LINKED>\n`
+      let prompt = `Here are the results of the search for "${query}" you requested.\n<LINKED>${results}</LINKED>. Feel free to ::fetch any URL which sounds like it might help answer the question or fill in details.\n`
       return prompt
     }
     return ""
