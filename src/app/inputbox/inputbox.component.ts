@@ -259,7 +259,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     if (this.chatLinesUntilNextContext < 0) {
       this.SetContext("THIS IS A REMINDER!")
     }
-    let expandedUserInput = await this.utilService.ReplaceUrls(input)
+    let expandedUserInput = await this.utilService.ReplaceUrl(input)
     this.AddToChat({
       index: this.chat_index,
       role: "user",
