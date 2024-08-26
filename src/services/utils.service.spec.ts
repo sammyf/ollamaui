@@ -2,6 +2,12 @@ import { TestBed } from '@angular/core/testing';
 import { UtilsService } from './utils.service';
 import {HttpClient} from "@angular/common/http";
 
+imports: [
+  HttpClient
+]
+
+providers: [HttpClient]
+
 describe('UtilsService', () => {
   let service: UtilsService;
   let _HttpClient: HttpClient;
