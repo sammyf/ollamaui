@@ -4,7 +4,7 @@ import {HttpClient} from "@angular/common/http";
 
 describe('UtilsService', () => {
   let service: UtilsService;
-  let _httpClient: HttpClient;
+  let _HttpClient: HttpClient;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
