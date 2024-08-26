@@ -1,19 +1,20 @@
 import { TestBed } from '@angular/core/testing';
 import { UtilsService } from './utils.service';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, provideHttpClient} from "@angular/common/http";
+import {provideAnimationsAsync} from "@angular/platform-browser/animations/async";
+import {provideHttpClientTesting} from "@angular/common/http/testing";
 
-imports: [
-  HttpClient
-]
-
-providers: [HttpClient]
 
 describe('UtilsService', () => {
   let service: UtilsService;
-  let _HttpClient: HttpClient;
+
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({    providers: [
+        provideHttpClient(),
+        provideAnimationsAsync(),
+        provideHttpClientTesting()
+      ]});
     service = TestBed.inject(UtilsService);
   });
 
