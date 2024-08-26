@@ -74,9 +74,8 @@ export class UtilsService {
     if (match) {
       // Get the URL which is the string following "::fetch "
       const url = match[1].trim().replace(/['"`´]/g, "");
-      console.log("URL : §§ "+url+" §§")
       // Call the RetrieveURLs function
-      let urlContent = await this.ReplaceUrls(url);
+      let urlContent = await this.ReplaceUrl(text, url);
       let prompt = `Here is the content of the URL you requested : ${urlContent}. Feel free to ::fetch any URL which sounds like it might help fill in details.\n`
       return prompt
     }
@@ -145,19 +144,11 @@ export class UtilsService {
     }
   }
 
-  async ReplaceUrls(source:string):Promise<string> {
-    let urlRegex: RegExp = /(https?:\/\/[^\s]+)/gi; // This is a regular expression that matches URLs.
-    let result: UrlResponse;
-    let urls = Array.from(source.matchAll(urlRegex));
-    console.log("Number of URLs found: ", urls.length);
-    for (let match of urls) {
-      let url = match[1];
-      console.log(`matched URL : =${url}`);
-      let body = await this.fetchUrl(url);
-      let content = this.TruncateToTokens(body.content,MAX_TOKENS)
-      let result = ` ( url:"${url}",  ReturnCode:${body.returnCode} )<LINKED>${content}</LINKED>`;
-      source = source.replace(url, result);
-    };
+  async ReplaceUrl(source:string, url:string):Promise<string> {
+    let body = await this.fetchUrl(url);
+    let content = this.TruncateToTokens(body.content,MAX_TOKENS)
+    let result = ` ( url:"${url}",  ReturnCode:${body.returnCode} )<LINKED>${content}</LINKED>`;
+    source = source.replace(url, result);
     return source; // This fetches the URL data and replaces the original URL with it wrapped in "<LINKED URL>{{FetchUrl(URL)}}</LINKED URL>" format.
   }
 
