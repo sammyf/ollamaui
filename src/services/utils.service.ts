@@ -15,7 +15,6 @@ const MAX_TOKENS: number = 1000;
   providedIn: 'root',
 })
 export class UtilsService {
-
   constructor(private http: HttpClient,
               private localStorage: LocalStorageService,) {
   }
@@ -66,10 +65,12 @@ export class UtilsService {
       "The `::search` tool is a powerful way to explore the internet and find answers to your questions. Just remember to enclose your query in backticks (`) and you're good to go!\n";
     return tools+fetch+search;
   }
+
   async  LookForCommands(text:string):Promise<string> {
     // Regular expression to check for ::fetch followed by a URL
     const fetchRegEx = /::fetch\s*((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/(\w#!:.?\+=&%@!\-\/\]])])?)/i;
     let match = text.match(fetchRegEx);
+
     if (match) {
       // Get the URL which is the string following "::fetch "
       const url = match[1].trim().replace(/['"`´]/g, "");
@@ -82,7 +83,7 @@ export class UtilsService {
 
     // Regular expression to check for ::fetch followed by a URL
     const searchRegEx = /::search\s*`(.+?)`/i;
-    match = text.match(fetchRegEx);
+    match = text.match(searchRegEx);
     if (match) {
       // Get the URL which is the string following "::fetch "
       const query = match[1].trim();

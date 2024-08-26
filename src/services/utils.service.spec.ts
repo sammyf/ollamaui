@@ -2,12 +2,12 @@ import { TestBed } from '@angular/core/testing';
 import { UtilsService } from './utils.service';
 import {HttpClient, provideHttpClient} from "@angular/common/http";
 import {provideAnimationsAsync} from "@angular/platform-browser/animations/async";
-import {provideHttpClientTesting} from "@angular/common/http/testing";
+import {HttpTestingController, provideHttpClientTesting} from "@angular/common/http/testing";
 
 
 describe('UtilsService', () => {
   let service: UtilsService;
-
+  let httpController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({    providers: [
@@ -16,6 +16,7 @@ describe('UtilsService', () => {
         provideHttpClientTesting()
       ]});
     service = TestBed.inject(UtilsService);
+    httpController = TestBed.inject(HttpTestingController);
   });
 
   it('should be created', () => {
@@ -42,6 +43,19 @@ describe('UtilsService', () => {
   it('should return a prompt when ::fetch is found in the text', async () => {
     const text = '::fetch https://example.com';
     const result = await service.LookForCommands(text);
+
+    const req = httpController.expectOne({
+      method: 'POST',
+      url: `https://beezle.cosmic-bandito.com/companion/spider`,
+    });
+
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toBeDefined();
+    expect(req.request.headers.get('X-CSRF-TOKEN')).toBeDefined();
+    expect(req.request.responseType).toBe('json');
+    expect(req.request.withCredentials).toBe(false);
+
+    req.flush("Here is the content of the URL you requested : <URLCONTENT>");
     expect(result).toBe(`Here is the content of the URL you requested : <URLCONTENT>\n`);
   });
 
