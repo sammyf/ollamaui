@@ -36,9 +36,6 @@ import {fullChatComponent} from "../full_chat/full_chat.component";
 import {MemoryService} from "../../services/memory.service";
 
 /* TODO :
-  * permanent memory
-  * call to the TTS server
-  * call to the internet/searx Engine
   * tests
  */
 const routes: Routes = [
