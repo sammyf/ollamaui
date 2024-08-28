@@ -73,7 +73,7 @@ export class UtilsService {
 
     if (match) {
       // Call the RetrieveURLs function
-      let urlContent = await this.ReplaceUrl(text);
+      let urlContent = await this.ReplaceUrl(match[1]);
       let prompt = `Here is the content of the URL you requested : ${urlContent}. Feel free to ::fetch any URL which sounds like it might help fill in details.\n`
       return prompt
     }
