@@ -58,8 +58,8 @@ export class UtilsService {
   // Commands and Internet Connection
   //
   GetCommandPrompt():string {
-    let tools = "These tools are available to you. You can use them autonomously without any intervention by the User :\n";
-    let fetch ="**::fetch** : The `::fetch` tool is now enabled for autonomous use. Simply type ::fetch followed by the desired URL (without any brackets or quotes) to fetch webpage content. I'll take care of retrieving the information for you.\n";
+    let tools = "These tools are available to you to use on your own. You can use them autonomously without any intervention by the User :\n";
+    let fetch ="**::fetch** : The `::fetch` tool is now enabled for autonomous use. Simply type ::fetch followed by the desired URL enclosed in backticks (`) to fetch webpage content. I'll take care of retrieving the information for you.\n";
     let search="**::search** : This tool allows you to search the internet using your favorite search engine, just like you would on a web browser." +
       "To use the ::search tool, simply type `::search` followed by the query you want to search for, enclosed in backticks (`). For example, if you wanted to search for information about 'LLM' and 'Code Companion', you would type ::search `LLM Code Companion`" +
       "The `::search` tool is a powerful way to explore the internet and find answers to your questions. Just remember to enclose your query in backticks (`) and you're good to go!\n";
@@ -68,21 +68,23 @@ export class UtilsService {
 
   async  LookForCommands(text:string):Promise<string> {
     // Regular expression to check for ::fetch followed by a URL
-    const fetchRegEx = /::fetch\s*((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/(\w#!:.?\+=&%@!\-\/\]])])?)/i;
+    const fetchRegEx = /::fetch\s*`((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/(\w#!:.?\+=&%@!\-\/\]])])?)`/i;
     let match = text.match(fetchRegEx);
 
     if (match) {
       // Call the RetrieveURLs function
-      let urlContent = await this.ReplaceUrl(match[1]);
+      console.log("Fetch Found")
+      let urlContent = await this.ReplaceUrl(match[1].trim().replace("\"","")
+        .replace("'","").replace("`","").replace("´",""));
       let prompt = `Here is the content of the URL you requested : ${urlContent}. Feel free to ::fetch any URL which sounds like it might help fill in details.\n`
       return prompt
     }
 
-    // Regular expression to check for ::fetch followed by a URL
+    // Regular expression to check for ::search followed by a query
     const searchRegEx = /::search\s*`(.+?)`/i;
     match = text.match(searchRegEx);
     if (match) {
-      // Get the URL which is the string following "::fetch "
+      // Get the URL which is the string following "::query "
       const query = match[1].trim();
       // Call the CallSearx function
       let results = await this.CallSearx(query);
@@ -150,7 +152,7 @@ export class UtilsService {
     if (match) {
       // Get the URL which is the string following "::fetch "
       const url = match[1].trim().replace(/['"`´]/g, "");
-      console.log(url)
+      console.log("url: ",url)
       let body = await this.fetchUrl(url);
       let content = this.TruncateToTokens(body.content, MAX_TOKENS)
       let result = ` ( url:"${url}",  ReturnCode:${body.returnCode} )<LINKED>${content}</LINKED>`;
