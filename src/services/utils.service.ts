@@ -67,13 +67,14 @@ export class UtilsService {
   }
 
   async  LookForCommands(text:string):Promise<string> {
+    console.log("Look For Commands");
     // Regular expression to check for ::fetch followed by a URL
     const fetchRegEx = /\**\*::fetch\s*\**\s*`((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/(\w#!:.?\+=&%@!\-\/\]])])?)`/i;
     let match = text.match(fetchRegEx);
 
     if (match) {
       // Call the RetrieveURLs function
-      console.log("Fetch Found")
+      console.log("Fetch found")
       let urlContent = await this.ReplaceUrl(match[1].trim().replace("\"","")
         .replace("'","").replace("`","").replace("´",""));
       let prompt = `Here is the content of the URL you requested : ${urlContent}. Feel free to ::fetch any URL which sounds like it might help fill in details.\n`
@@ -84,6 +85,7 @@ export class UtilsService {
     const searchRegEx = /\**\*::fetch\s*\**\s*`(.+?)`/i;
     match = text.match(searchRegEx);
     if (match) {
+      console.log("Search found")
       // Get the URL which is the string following "::query "
       const query = match[1].trim();
       // Call the CallSearx function
