@@ -288,7 +288,9 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     };
     this.user_input = "";
     this.answer = await this.ollamaService.sendRequest({postData: postData}) ?? "Something went wrong.";
+    console.log("Answer received!")
     let cmd = await this.utilService.LookForCommands(this.answer)
+    console.log("Command found : ",cmd)
     if (cmd !== "") {
       await this.DisplayLLMAnswer()
       await this.GetLLMAnswer(cmd)
