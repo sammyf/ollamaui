@@ -124,7 +124,7 @@ export class UtilsService {
     try{
       let response:UrlResponse =  await lastValueFrom(
         this.http.post<UrlResponse>(
-          `${environment.companionUrl}/async/fetch?cache=${Math.floor(Math.random() * 10000000)}`,
+          `${environment.companionUrl}/companion/spider?cache=${Math.floor(Math.random() * 10000000)}`,
           urlRequest,
           {
             responseType: 'json',
