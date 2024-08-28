@@ -143,11 +143,13 @@ export class UtilsService {
   }
 
   async ReplaceUrl(source:string):Promise<string> {
-    const fetchRegEx = /::fetch\s*((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/(\w#!:.?\+=&%@!\-\/\]])])?)/i;
-    let match = source.match(fetchRegEx);
+    const urlRegEx = /((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/(\w#!:.?\+=&%@!\-\/\]])])?)/i;
+    let match = source.match(urlRegEx);
+    console.log(source)
     if (match) {
       // Get the URL which is the string following "::fetch "
       const url = match[1].trim().replace(/['"`´]/g, "");
+      console.log(url)
       let body = await this.fetchUrl(url);
       let content = this.TruncateToTokens(body.content, MAX_TOKENS)
       let result = ` ( url:"${url}",  ReturnCode:${body.returnCode} )<LINKED>${content}</LINKED>`;
