@@ -69,7 +69,7 @@ export class UtilsService {
   async  LookForCommands(text:string):Promise<string> {
     console.log("Look For Commands");
     // Regular expression to check for ::fetch followed by a URL
-    const fetchRegEx = /\**\*::fetch\s*\**\s*`((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/(\w#!:.?\+=&%@!\-\/\]])])?)`/i;
+    const fetchRegEx = /\**::fetch\s*\**\s*`((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/(\w#!:.?\+=&%@!\-\/\]])])?)`/i;
     let match = text.match(fetchRegEx);
 
     if (match) {
@@ -82,7 +82,7 @@ export class UtilsService {
     }
 
     // Regular expression to check for ::search followed by a query
-    const searchRegEx = /\**\*::fetch\s*\**\s*`(.+?)`/i;
+    const searchRegEx = /\**::search\s*\**\s*`(.+?)`/i;
     match = text.match(searchRegEx);
     if (match) {
       console.log("Search found")
