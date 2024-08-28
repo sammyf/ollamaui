@@ -306,7 +306,12 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   async DisplayLLMAnswer() {
     this.ttsClip = await this.ttsService.getTTS(this.answer, this.currentPersona?.speaker ?? "p243");
     this.updateAudioSource();
-    let highlightedCode = this.utilService.DoHighlight(this.answer);
+    let highlightedCode = this.answer;
+    try {
+        highlightedCode = this.utilService.DoHighlight(this.answer);
+    } catch (e) {
+        // pass
+    }
 
     this.AddToChat({
       index: this.chat_index,
