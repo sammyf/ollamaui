@@ -131,6 +131,7 @@ export class UtilsService {
           }
         )
       );
+      console.log(response)
       // @ts-ignore
       return response;
     } catch (error) {
