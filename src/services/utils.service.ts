@@ -68,7 +68,7 @@ export class UtilsService {
 
   async  LookForCommands(text:string):Promise<string> {
     // Regular expression to check for ::fetch followed by a URL
-    const fetchRegEx = /::fetch\s*`((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/(\w#!:.?\+=&%@!\-\/\]])])?)`/i;
+    const fetchRegEx = /\**\*::fetch\s*\**\s*`((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/(\w#!:.?\+=&%@!\-\/\]])])?)`/i;
     let match = text.match(fetchRegEx);
 
     if (match) {
@@ -81,7 +81,7 @@ export class UtilsService {
     }
 
     // Regular expression to check for ::search followed by a query
-    const searchRegEx = /::search\s*`(.+?)`/i;
+    const searchRegEx = /\**\*::fetch\s*\**\s*`(.+?)`/i;
     match = text.match(searchRegEx);
     if (match) {
       // Get the URL which is the string following "::query "
