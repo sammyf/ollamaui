@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { PersonasService } from './personas.service';
 import { Persona } from '../models/ollama.models';
-import { mockPersonas } from '../mocks/mockPersonas';
+import { mockPersonas } from '../assets/data/personas';
 
 describe('PersonasService', () => {
   let service: PersonasService;
