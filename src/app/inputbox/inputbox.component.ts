@@ -82,7 +82,9 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   ttsClip: string = "";
 
   chatLinesUntilNextContext: number = -1;
-  renewContextAfter: number = 15;
+  chatLinesUntilMemories: number = -1;
+  renewContextAfter: number = 5;
+  buildNewMemoriesAfter: number = 10;
 
   DefaultContext: string = "";
   DefaultPersona: string = "Beezle"
@@ -253,6 +255,10 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.SetContext("");
     }
     this.previousUsername = this.username;
+    if (this.chatLinesUntilMemories < 0) {
+      this.chatLinesUntilMemories = this.buildNewMemoriesAfter;
+      this.memoryService.GenerateMemories(this.csrfToken ?? "");
+    }
     if (this.chatLinesUntilNextContext < 0) {
       this.SetContext("THIS IS A REMINDER!")
     }
@@ -264,6 +270,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       persona: "user"
     });
     this.chatLinesUntilNextContext -= 1;
+    this.chatLinesUntilMemories -= 1;
     this.localStorage.setItem('chat_history', JSON.stringify(this.chat_history));
 
     if ((this.selectedModel === undefined) || (this.selectedModel === "")) {
@@ -319,7 +326,6 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       content: highlightedCode,
       persona: this.selectedPersona
     });
-    this.chatLinesUntilNextContext -= 1;
   }
 
   GetModel(): Model | undefined {
