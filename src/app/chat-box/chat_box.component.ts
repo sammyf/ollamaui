@@ -19,11 +19,12 @@ export class ChatBoxComponent {
   @Input() role!: string;
   @Input() persona!: string;
   @Input() isMemory!: boolean;
-  @Input() firstId!: bigint;
-  @Input() lastId!: bigint;
-  @Output() showDetailsEvent = new EventEmitter<{ firstId: bigint, lastId: bigint }>();
+  @Input() firstId!: number;
+  @Input() lastId!: number;
+  @Output() showDetailsEvent = new EventEmitter<{ firstId: number, lastId: number }>();
 
   onClick() {
+    console.log('onclick invoked');
     if (this.isMemory) {
       this.showDetailsEvent.emit({firstId: this.firstId, lastId: this.lastId});
     }

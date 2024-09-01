@@ -141,7 +141,7 @@ export class MemoryService {
     }
   }
 
-  async GetMemoryDetails(csrfToken:string, firstId: bigint, lastId:bigint):Promise<Array<Messages>> {
+  async GetMemoryDetails(csrfToken:string, firstId: number, lastId:number):Promise<Array<Messages>> {
     const headers = new HttpHeaders().set('X-CSRF-TOKEN', csrfToken);
     try{
       let response:Array<Messages> =  await lastValueFrom(

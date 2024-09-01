@@ -452,7 +452,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     this.showUsernamePopup = true;
   }
 
-  async showDetailsEvent(event:  { firstId: bigint, lastId: bigint } ): Promise<void> {
+  async showDetailsEvent(event:  { firstId: number, lastId: number } ): Promise<void> {
     this.chat_memory = await this.memoryService.GetMemoryDetails(this.csrfToken ?? "", event.firstId, event.lastId)
     this.show_details = true;
   }

@@ -66,8 +66,8 @@ linked {
 }
 
 img.memoryDetails {
-  clear: top ;
   float: right;
   width:15px;
   height:15px;
+  margin:5px;
 }

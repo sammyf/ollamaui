@@ -2,7 +2,7 @@
      [attr.data-first-id]="firstId"
      [attr.data-last-id]="lastId">
   <img src="../assets/images/{{persona}}.png" class="portrait {{role}}">
-  <pre class="output {{role}}" *ngIf="(role === 'user') || (role === 'system'); else elseBlock">{{content|hideUrlSource}}></pre>
+  <img src="assets/images/details_icon.png" class="memoryDetails" (click)="onClick()" *ngIf="persona==='Memory'">
+  <pre class="output {{role}}" *ngIf="(role === 'user') || (role === 'system'); else elseBlock">{{content|hideUrlSource}}</pre>
   <ng-template #elseBlock><pre class="output {{role}}" highlight-js [innerHTML]="content"></pre></ng-template>
-  <img src="assets/images/details_icon.png" class="memoryDetails" (click)="onClick()" *ngIf="role === 'memory'">
 </div>
