@@ -71,17 +71,13 @@ export interface Answer {
 // }
 
 export class Messages {
-  constructor(
-    public index: number,
-    public role: string,
-    public content: string,
-    public persona: string = 'Diem'
-  ) {
-    this.index = index;
-    this.role = role;
-    this.content = content;
-    this.persona = persona;
-  }
+    public index: number = -1;
+    public role: string = '';
+    public content: string = '';
+    public persona: string = '';
+    public is_memory: boolean = false;
+    public first_id: number = -1;
+    public last_id: number = -1;
 }
 
 export class Persona {
@@ -122,4 +118,9 @@ export class Memories {
 
 export class QueryRequest {
   query:string = "";
+}
+
+export class MemoryDetailRequest {
+  firstId: number = 0;
+  lastId: number = 0;
 }

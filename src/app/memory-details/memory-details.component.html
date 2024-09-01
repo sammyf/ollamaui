@@ -1,0 +1,5 @@
+<div id="memory_details">
+  @for ( msg of chat_history; track msg.index) {
+    <chat_box [persona]="msg.persona" [role]="msg.role" [content]="msg.content"></chat_box>
+  }
+ </div>

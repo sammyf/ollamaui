@@ -36,6 +36,9 @@ export class fullChatComponent implements OnInit {
         role: 'user',
         content: 'Not Logged In',
         persona: 'Not Logged In',
+        is_memory: false,
+        first_id: -1,
+        last_id: -1
       }
       this.chat_memory = [msg]
     }

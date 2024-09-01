@@ -15,9 +15,10 @@
 </select>
 
 <div id="container">
+  <app-memory-details *ngIf="show_details" [chat_history]="chat_memory" (mouseout)="show_details=false"></app-memory-details>
   <div class="outputbox" id="history" onChange="ScrollDown()" #scrollContainer>
     @for ( msg of chat_history; track msg.index) {
-      <chat_box [persona]="msg.persona" [role]="msg.role" [content]="msg.content" (change)="SetPersona('', true)"></chat_box>
+      <chat_box [persona]="msg.persona" [role]="msg.role" [content]="msg.content" [isMemory]="msg.is_memory"  (showDetailsEvent)="showDetailsEvent($event)"></chat_box>
     }
     <img src="../../assets/images/loader.gif" id="spinner" class="spinner" *ngIf="spinnerState" />
   </div>

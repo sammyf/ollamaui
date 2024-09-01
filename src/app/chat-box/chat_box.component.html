@@ -1,5 +1,8 @@
-<div class="output {{role}}" >
+<div class="output {{role}}"   [attr.data-is-memory]="isMemory"
+     [attr.data-first-id]="firstId"
+     [attr.data-last-id]="lastId">
   <img src="../assets/images/{{persona}}.png" class="portrait {{role}}">
-  <pre class="output {{role}}" *ngIf="(role === 'user') || (role === 'system'); else elseBlock">{{content|hideUrlSource}}</pre>
+  <pre class="output {{role}}" *ngIf="(role === 'user') || (role === 'system'); else elseBlock">{{content|hideUrlSource}}></pre>
   <ng-template #elseBlock><pre class="output {{role}}" highlight-js [innerHTML]="content"></pre></ng-template>
+  <img src="assets/images/details_icon.png" class="memoryDetails" (click)="onClick()" *ngIf="role === 'memory'">
 </div>

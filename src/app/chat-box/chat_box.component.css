@@ -64,3 +64,10 @@ img.user {
 linked {
   display: none;
 }
+
+img.memoryDetails {
+  clear: top ;
+  float: right;
+  width:15px;
+  height:15px;
+}

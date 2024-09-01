@@ -139,7 +139,7 @@ export class OllamaService {
     }
   }
 
-  async UnloadModel(modelName: string){
+  async UnloadModel(modelName: string) {
     let postData: Prompt = {
       "model": modelName,
       "stream": false,
@@ -154,14 +154,14 @@ export class OllamaService {
     });
 
     try {
-        this.http.post<any>(
-          `${environment.companionUrl}/async/unload?cache=${Math.floor(Math.random() * 10000000)}`,
-          postData,
-          {
-            responseType: 'json',
-            headers: headers,
-          }
-        )
+      this.http.post<any>(
+        `${environment.companionUrl}/async/unload?cache=${Math.floor(Math.random() * 10000000)}`,
+        postData,
+        {
+          responseType: 'json',
+          headers: headers,
+        }
+      )
       return;
     } catch (error) {
       console.error(error);

@@ -34,6 +34,7 @@ import hljs from 'highlight.js';
 import {Message} from "nx/src/daemon/client/daemon-socket-messenger";
 import {fullChatComponent} from "../full_chat/full_chat.component";
 import {MemoryService} from "../../services/memory.service";
+import {MemoryDetailsComponent} from "../memory-details/memory-details.component";
 
 /* TODO :
   * tests
@@ -51,7 +52,7 @@ const routes: Routes = [
   templateUrl: './inputbox.component.html',
   styleUrls: ['./inputbox.component.css'],
   standalone: true,
-  imports: [ChatBoxComponent, FormsModule, CommonModule, UsernamePopupComponent, fullChatComponent],
+  imports: [ChatBoxComponent, FormsModule, CommonModule, UsernamePopupComponent, fullChatComponent, MemoryDetailsComponent],
 })
 
 export class InputBoxComponent implements AfterViewChecked, OnInit {
@@ -102,6 +103,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   system_prompt: string = this.DefaultContext;
   system_tools: string = ""
   csrfToken: string | null;
+
   chat_history: Array<Messages> = [];
   chat_memory: Array<Messages> = [];
 
@@ -142,6 +144,9 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     });
 
   };
+  show_details: boolean = false;
+  last_details_shown: Array<Messages> = [];
+
 
   model_array: Array<Model> = new Array<Model>();
 
@@ -199,7 +204,15 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     if (this.chat_history.length > 0) {
       this.chat_index = this.chat_history[this.chat_history.length - 1].index;
     }
-    this.AddToChat({index: this.chat_index, role: "system", content: this.system_prompt+this.system_tools, persona: "user"});
+    this.AddToChat({
+      index: this.chat_index,
+      role: "system",
+      content: this.system_prompt+this.system_tools,
+      persona: "user",
+      is_memory: false,
+      first_id: -1,
+      last_id: -1
+    });
     this.chat_memory = this.chat_history
     // @ts-ignore
     this.model_array.sort((a, b) => {
@@ -267,7 +280,10 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       index: this.chat_index,
       role: "user",
       content: this.utilService.GetTimeDate() + expandedUserInput,
-      persona: "user"
+      persona: "user",
+      is_memory: false,
+      first_id: -1,
+      last_id: -1
     });
     this.chatLinesUntilNextContext -= 1;
     this.chatLinesUntilMemories -= 1;
@@ -324,7 +340,10 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       index: this.chat_index,
       role: "assistant",
       content: highlightedCode,
-      persona: this.selectedPersona
+      persona: this.selectedPersona,
+      is_memory: false,
+      first_id: -1,
+      last_id: -1
     });
   }
 
@@ -389,7 +408,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   SetContext(contextAdd:string){
     this.chatLinesUntilNextContext = this.renewContextAfter
     this.system_prompt = `${contextAdd}. My, the user, name is ${this.username}. ${this.currentPersona?.context??this.DefaultContext}.You, the AI, are ${this.selectedPersona}.`;
-    this.AddToChat({index:this.chat_index, role: "system", content: this.system_prompt, persona: "user"});
+    this.AddToChat({index:this.chat_index, role: "system", content: this.system_prompt, persona: "user", is_memory: false, first_id: -1, last_id: -1});
   }
 
   reverseTruncateHistory(size:number):Array<Messages> {
@@ -433,6 +452,10 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     this.showUsernamePopup = true;
   }
 
+  async showDetailsEvent(event:  { firstId: bigint, lastId: bigint } ): Promise<void> {
+    this.chat_memory = await this.memoryService.GetMemoryDetails(this.csrfToken ?? "", event.firstId, event.lastId)
+    this.show_details = true;
+  }
 
   protected readonly parent = parent;
   protected readonly Event = Event;
