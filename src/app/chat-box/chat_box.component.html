@@ -1,8 +1,11 @@
-<div class="output {{role}}"   [attr.data-is-memory]="isMemory"
-     [attr.data-first-id]="firstId"
-     [attr.data-last-id]="lastId">
+<div class="output {{role}}">
   <img src="../assets/images/{{persona}}.png" class="portrait {{role}}">
   <img src="assets/images/details_icon.png" class="memoryDetails" (click)="onClick()" *ngIf="persona==='Memory'">
   <pre class="output {{role}}" *ngIf="(role === 'user') || (role === 'system'); else elseBlock">{{content|hideUrlSource}}</pre>
   <ng-template #elseBlock><pre class="output {{role}}" highlight-js [innerHTML]="content"></pre></ng-template>
+  <div class="memory_details" *ngIf="showMemory">
+    @for ( msg of chatMemory; track msg.index) {
+      <chat_box [persona]="msg.persona" [role]="msg.role" [content]="msg.content" [isMemory]="msg.is_memory" [firstId]="-1" [lastId]="-1" [csrfToken]="null"></chat_box>
+    }
+  </div>
 </div>

@@ -34,7 +34,6 @@ import hljs from 'highlight.js';
 import {Message} from "nx/src/daemon/client/daemon-socket-messenger";
 import {fullChatComponent} from "../full_chat/full_chat.component";
 import {MemoryService} from "../../services/memory.service";
-import {MemoryDetailsComponent} from "../memory-details/memory-details.component";
 
 /* TODO :
   * tests
@@ -52,7 +51,7 @@ const routes: Routes = [
   templateUrl: './inputbox.component.html',
   styleUrls: ['./inputbox.component.css'],
   standalone: true,
-  imports: [ChatBoxComponent, FormsModule, CommonModule, UsernamePopupComponent, fullChatComponent, MemoryDetailsComponent],
+  imports: [ChatBoxComponent, FormsModule, CommonModule, UsernamePopupComponent, fullChatComponent],
 })
 
 export class InputBoxComponent implements AfterViewChecked, OnInit {
@@ -451,11 +450,6 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   ClearUsername() {
     this.showUsernamePopup = true;
-  }
-
-  async showDetailsEvent(event:  { firstId: number, lastId: number } ): Promise<void> {
-    this.chat_memory = await this.memoryService.GetMemoryDetails(this.csrfToken ?? "", event.firstId, event.lastId)
-    this.show_details = true;
   }
 
   protected readonly parent = parent;
