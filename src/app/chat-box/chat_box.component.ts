@@ -30,6 +30,7 @@ export class ChatBoxComponent implements OnInit {
   }
 
   async ngOnInit() {
+    console.log(this.firstId, this.lastId, this.csrfToken);
     if(this.csrfToken !== null) {
       this.chatMemory = await this.memoryService.GetMemoryDetails(this.csrfToken, this.firstId, this.lastId);
     }

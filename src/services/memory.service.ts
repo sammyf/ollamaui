@@ -145,8 +145,13 @@ export class MemoryService {
     const headers = new HttpHeaders().set('X-CSRF-TOKEN', csrfToken);
     try{
       let response:Array<Messages> =  await lastValueFrom(
-        this.http.get<Array<Messages>>(
+        this.http.post<Array<Messages>>(
           `${environment.companionUrl}/async/getMemoryDetails?cache=${Math.floor(Math.random() * 10000000)}`,
+          {
+            csrfToken: csrfToken,
+            firstId: firstId,
+            lastId: lastId,
+          },
           {
             headers: headers,
             responseType: 'json',
