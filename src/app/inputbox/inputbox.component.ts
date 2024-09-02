@@ -84,7 +84,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   chatLinesUntilNextContext: number = -1;
   chatLinesUntilMemories: number = -1;
-  renewContextAfter: number = 5;
+  renewContextAfter: number = 15;
   buildNewMemoriesAfter: number = 10;
 
   DefaultContext: string = "";
@@ -273,6 +273,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.memoryService.GenerateMemories(this.csrfToken ?? "");
     }
     if (this.chatLinesUntilNextContext < 0) {
+      this.chatLinesUntilNextContext = this.renewContextAfter;
       this.SetContext("THIS IS A REMINDER!")
     }
     let expandedUserInput = await this.utilService.ReplaceUrl(input)
