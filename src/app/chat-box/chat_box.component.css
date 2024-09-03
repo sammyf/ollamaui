@@ -66,8 +66,20 @@ linked {
 }
 
 img.memoryDetails {
-  float: right;
   width:15px;
   height:15px;
   margin:5px;
+  float:right;
+}
+
+div.memoryContainer {
+  width:75%;
+  margin-left:auto;
+  margin-right:auto;
+  border-color: #26380b;
+  border-style: solid;
+  border-width: thin;
+  background-color: #27360d;
+  padding: 5px;
+  box-shadow: inset 0 0 10px #000000; /* Change as necessary */
 }

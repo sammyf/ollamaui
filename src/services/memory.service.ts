@@ -148,9 +148,8 @@ export class MemoryService {
         this.http.post<Array<Messages>>(
           `${environment.companionUrl}/async/getMemoryDetails?cache=${Math.floor(Math.random() * 10000000)}`,
           {
-            csrfToken: csrfToken,
-            firstId: firstId,
-            lastId: lastId,
+            first_id: firstId,
+            last_id: lastId,
           },
           {
             headers: headers,
