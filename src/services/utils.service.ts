@@ -62,7 +62,7 @@ export class UtilsService {
     let fetch ="**::fetch** : The `::fetch` tool is now enabled for autonomous use. Simply type ::fetch followed by the desired URL enclosed in backticks (`) to fetch webpage content. I'll take care of retrieving the information for you.\n";
     let search="**::search** : This tool allows you to search the internet using your favorite search engine, just like you would on a web browser." +
       "To use the ::search tool, simply type `::search` followed by the query you want to search for, enclosed in backticks (`). For example, if you wanted to search for information about 'LLM' and 'Code Companion', you would type ::search `LLM Code Companion`" +
-      "The `::search` tool is a powerful way to explore the internet and find answers to your questions. Just remember to enclose your query in backticks (`) and you're good to go!\n";
+      "The `::search` tool is a powerful way to explore the internet and find answers to your questions. Just remember to enclose your query in backticks (`), say again what you are overall searching so that you remember it and you're good to go!\n";
     return tools+fetch+search;
   }
 

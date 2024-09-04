@@ -85,6 +85,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   chatLinesUntilMemories: number = -1;
   renewContextAfter: number = 15;
   buildNewMemoriesAfter: number = 10;
+  do_scroll:boolean = true;
 
   DefaultContext: string = "";
   DefaultPersona: string = "Beezle"
@@ -175,7 +176,6 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.selectedModel = this.localStorage.getItem("currentModel") ?? "";
     }
     if( this.selectedModel === "None" ) {
-      console.log("+++++++++++++++++++++  B");
       this.model_array = await this.ollamaService.getModels();
       let r: number = Math.floor(Math.random() * this.model_array.length);
       this.selectedModel = this.model_array[r].name;
@@ -236,7 +236,6 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       volume = 0.5
     }
 
-    console.log("Volume is: ", volume);
     // @ts-ignore
     this.audioPlayer.nativeElement.volume = volume;
     this.SetPersona("", true);
@@ -253,6 +252,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   async GetLLMAnswer(input: string) {
     this.showSpinner(true);
+    this.do_scroll = true;
     this.username = this.utilService.GetUsername();
     if (this.previousSelectedPersona === "" || this.previousSelectedPersona === undefined) {
       this.previousSelectedPersona = this.selectedPersona;
@@ -433,7 +433,9 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   }
 
   ngAfterViewChecked() {
-    this.ScrollToBottom();
+    if(this.do_scroll) {
+      this.ScrollToBottom();
+    }
   }
 
   updateAudioSource(): void {
@@ -450,6 +452,10 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   ClearUsername() {
     this.showUsernamePopup = true;
+  }
+
+  public handleScrollChange(doScroll: boolean): void {
+    this.do_scroll = doScroll;
   }
 
   protected readonly parent = parent;

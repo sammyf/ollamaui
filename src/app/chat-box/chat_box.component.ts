@@ -23,6 +23,7 @@ export class ChatBoxComponent implements OnInit {
   @Input() firstId: number=-1;
   @Input() lastId: number=-1;
   @Input() csrfToken: string|null = null;
+  @Output() doScrollChanged = new EventEmitter<boolean>();
   showMemory: boolean = false;
   chatMemory: Array<Messages> = []
 
@@ -36,6 +37,7 @@ export class ChatBoxComponent implements OnInit {
     }
   }
   async onClick() {
+    this.doScrollChanged.emit(false);
     this.showMemory = !this.showMemory;
   }
 }
