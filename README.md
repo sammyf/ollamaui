@@ -45,7 +45,8 @@ Install the companion apps by cloning their repos and following their respective
 
 #### HOW TO RUN IT :
 Make sure the Companion Apps are running.
-./serve.sh
+
+`./serve.sh`
 
 #### HOW TO EXPOSE THE SERVICE OUTWARD
 First of all : **don't**! If you really want or need to, then at least implement some basic auth in front. 
