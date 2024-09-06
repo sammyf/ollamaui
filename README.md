@@ -1,4 +1,4 @@
-### Ollamaui
+## Ollamaui
 
 Yet Again An Ollama UI ... This one is Cloudflare 524 safe, it implements
 * seamless personalities switch
