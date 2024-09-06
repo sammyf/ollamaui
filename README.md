@@ -18,7 +18,7 @@ Do you need it? Probably not, but it's fun to write, so sue me ...
 #### DISCLAIMER
 
 This code comes with no guarantee whatsoever. You'll need to have an ollama server running under the 
-same URL to bypass CORS, and ~~if you use the companion app~~ the companion app you WILL need to make this work, 
+same URL to bypass CORS, andthe companion appsas you WILL need to make this work, 
 will need to use the same URL too and have direct access to Ollama without using URL's! This change was needed 
 to fix timeouts caused by too long request being blocked by CloudFlare. 
 
