@@ -301,6 +301,9 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     }
     this.localStorage.setItem("currentModel", this.selectedModel);
     this.model = this.GetModel();
+    if(this.selectedModel === undefined|| this.selectedModel === "") {
+      this.selectedModel = this.model?.name??this.DefaultModel;
+    }
     let postData: Prompt = {
       "model": this.selectedModel,
       "stream": false,
