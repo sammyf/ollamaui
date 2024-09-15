@@ -146,7 +146,7 @@ export class OllamaService {
       "temperature": 1,
       "messages": [],
       "keep_alive": 0,
-      "num_ctx": 64000
+      "num_ctx": 1
     };
     const headers = new HttpHeaders({
       'content-type': 'application/json',

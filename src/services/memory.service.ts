@@ -164,4 +164,26 @@ export class MemoryService {
       return [];
     }
   }
+
+  async GetRelatedMemory(csrfToken:string, prompt:string):Promise<string> {
+    const headers = new HttpHeaders().set('X-CSRF-TOKEN', csrfToken);
+    try{
+      let response:string =  await lastValueFrom(
+        this.http.post<string>(
+          `${environment.companionUrl}/async/retrieveRelatedMemory?cache=${Math.floor(Math.random() * 10000000)}`,
+          {
+            prompt: prompt,
+          },
+          {
+            headers: headers,
+            responseType: 'json',
+          }
+        )
+      );
+      // @ts-ignore
+      return response;
+    } catch (error) {
+      return "";
+    }
+  }
 }

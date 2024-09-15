@@ -106,7 +106,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   chat_history: Array<Messages> = [];
   chat_memory: Array<Messages> = [];
-
+  lastRelatedMemory:string|undefined  = undefined;
   chat_index: number = 0;
   showFullChatToggle: boolean = false;
 
@@ -271,6 +271,13 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.chatLinesUntilMemories = this.buildNewMemoriesAfter;
       this.memoryService.GenerateMemories(this.csrfToken ?? "");
     }
+    if( this.lastRelatedMemory === undefined) {
+      let relatedMemories = await this.memoryService.GetRelatedMemory(this.csrfToken ?? "", input);
+      if (relatedMemories !== "") {
+        this.lastRelatedMemory = relatedMemories;
+        this.chatLinesUntilNextContext = 1
+      }
+    }
     if (this.chatLinesUntilNextContext < 0) {
       this.chatLinesUntilNextContext = this.renewContextAfter;
       this.SetContext("THIS IS A REMINDER!")
@@ -410,7 +417,12 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   SetContext(contextAdd:string){
     this.chatLinesUntilNextContext = this.renewContextAfter
-    this.system_prompt = `${contextAdd}. My, the user, name is ${this.username}. ${this.currentPersona?.context??this.DefaultContext}.You, the AI, are ${this.selectedPersona}.`;
+    let memory = "";
+    if( this.lastRelatedMemory !== undefined ){
+      memory = `[The current discussion reminds you of this memory : ${this.lastRelatedMemory}]`;
+      this.lastRelatedMemory = undefined;
+    }
+    this.system_prompt = `${contextAdd}. My, the user, name is ${this.username}. ${this.currentPersona?.context??this.DefaultContext}.You, the AI, are ${this.selectedPersona}.${memory}`;
     this.AddToChat({index:this.chat_index, role: "system", content: this.system_prompt, persona: "user", is_memory: false, first_id: -1, last_id: -1});
   }
 
