@@ -271,13 +271,14 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.chatLinesUntilMemories = this.buildNewMemoriesAfter;
       this.memoryService.GenerateMemories(this.csrfToken ?? "");
     }
-    if( this.lastRelatedMemory === undefined) {
-      let relatedMemories = await this.memoryService.GetRelatedMemory(this.csrfToken ?? "", input);
-      if (relatedMemories !== "") {
-        this.lastRelatedMemory = relatedMemories;
-        this.chatLinesUntilNextContext = 1
-      }
-    }
+    // TOFIX
+    // if( this.lastRelatedMemory === undefined) {
+    //   let relatedMemories = await this.memoryService.GetRelatedMemory(this.csrfToken ?? "", input);
+    //   if (relatedMemories !== "") {
+    //     this.lastRelatedMemory = relatedMemories;
+    //     this.chatLinesUntilNextContext = 1
+    //   }
+    // }
     if (this.chatLinesUntilNextContext < 0) {
       this.chatLinesUntilNextContext = this.renewContextAfter;
       this.SetContext("THIS IS A REMINDER!")
