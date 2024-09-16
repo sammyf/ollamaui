@@ -317,11 +317,10 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       "stream": false,
       "temperature": 1.31,
       "messages": this.chat_history,
-      "keep_alive": -1,
-      "num_ctx": 64000
+      "keep_alive": -1
     };
     this.user_input = "";
-    this.answer = await this.ollamaService.sendRequest({postData: postData}) ?? "Something went wrong.";
+    this.answer = await this.ollamaService.sendRequest(this.csrfToken??"", postData) ?? "Something went wrong.";
     console.log("Answer received!")
     let cmd = await this.utilService.LookForCommands(this.answer)
     console.log("Command found : ",cmd)

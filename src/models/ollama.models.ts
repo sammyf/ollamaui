@@ -95,19 +95,12 @@ export class Persona {
 }
 
 export class Prompt {
-  constructor(
-    public model: string = 'llama3.1',
-    public stream: boolean = false,
-    public temperature: number = 1.31,
-    public messages: Array<Messages> = new Array<Messages>(),
-    public keep_alive: number = 0,
-    public num_ctx: number = 64000,
-  ) {
-    this.model = model;
-    this.stream = stream;
-    this.temperature = temperature;
-    this.messages = messages;
-  }
+    public model: string = 'llama3.1';
+    public stream: boolean = false;
+    public temperature: number = 1.31;
+    public messages: Array<Messages> = new Array<Messages>();
+    public keep_alive: number = 0;
+    // public num_ctx: number = 64000;
 }
 
 export class Memories {

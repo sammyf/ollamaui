@@ -61,11 +61,12 @@ export class OllamaService {
   //
   // Prompting Ollama must be done via a queue, to avoid CloudFlare timeouts (returncode 524)
   //
-  async sendRequest({postData}: Answer): Promise<string | undefined> {
+  async sendRequest(csrfToken: string, postData:Prompt): Promise<string | undefined> {
     try {
       const headers = new HttpHeaders({
         'content-type': 'application/json',
         'encoding': 'utf-8',
+        'X-CSRF-TOKEN': csrfToken
       });
       const requestId: {uniqueID:string} = await lastValueFrom(
         this.http.post<{uniqueID:string}>(
@@ -145,8 +146,7 @@ export class OllamaService {
       "stream": false,
       "temperature": 1,
       "messages": [],
-      "keep_alive": 0,
-      "num_ctx": 1
+      "keep_alive": 0
     };
     const headers = new HttpHeaders({
       'content-type': 'application/json',
