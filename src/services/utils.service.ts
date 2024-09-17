@@ -59,9 +59,9 @@ export class UtilsService {
   //
   GetCommandPrompt():string {
     let tools = "These tools are available to you to use on your own. You can use them autonomously without any intervention by the User :\n";
-    let fetch ="**::fetch** : The `::fetch` tool is now enabled for autonomous use. Simply type ::fetch followed by the desired URL enclosed in backticks (`) to fetch webpage content. I'll take care of retrieving the information for you.\n";
+    let fetch ="**::fetch** : The `::fetch` tool is now enabled for autonomous use. Simply type ::fetch followed by the desired URL, enclosed in backticks (`), to fetch webpage content. I'll take care of retrieving the information for you.\n";
     let search="**::search** : This tool allows you to search the internet using your favorite search engine, just like you would on a web browser." +
-      "To use the ::search tool, simply type `::search` followed by the query you want to search for, enclosed in backticks (`). For example, if you wanted to search for information about 'LLM' and 'Code Companion', you would type ::search `LLM Code Companion`" +
+      "To use the ::search tool, simply type `::search` followed by the query, enclosed in backticks (`), you want to search for. For example, if you wanted to search for information about 'LLM' and 'Code Companion', you would type ::search `LLM Code Companion`" +
       "The `::search` tool is a powerful way to explore the internet and find answers to your questions. Just remember to enclose your query in backticks (`), say again what you are overall searching so that you remember it and you're good to go!\n";
     return tools+fetch+search;
   }
@@ -69,7 +69,7 @@ export class UtilsService {
   async  LookForCommands(text:string):Promise<string> {
     console.log("Look For Commands");
     // Regular expression to check for ::fetch followed by a URL
-    const fetchRegEx = /\**::fetch\s*\**\s*`((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/(\w#!:.?\+=&%@!\-\/\]])])?)`/i;
+    const fetchRegEx = /\**::fetch\s*\**\s*[`|"|']((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/(\w#!:.?\+=&%@!\-\/\]])])?)[`|"|']/i;
     let match = text.match(fetchRegEx);
 
     if (match) {
@@ -82,7 +82,7 @@ export class UtilsService {
     }
 
     // Regular expression to check for ::search followed by a query
-    const searchRegEx = /\**::search\s*\**\s*`(.+?)`/i;
+    const searchRegEx = /\**::search\s*\**\s*[`|"|'](.+?)[`|"|']/i;
     match = text.match(searchRegEx);
     if (match) {
       console.log("Search found")
