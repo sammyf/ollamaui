@@ -175,7 +175,9 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       console.log("+++++++++++++++++++++  A");
       this.selectedModel = this.localStorage.getItem("currentModel") ?? "";
     }
+    console.log("SELECTED MODEl : '"+this.selectedModel+"'");
     if( this.selectedModel === "None" ) {
+
       this.model_array = await this.ollamaService.getModels();
       let r: number = Math.floor(Math.random() * this.model_array.length);
       this.selectedModel = this.model_array[r].name;
@@ -253,6 +255,19 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   async GetLLMAnswer(input: string) {
     this.showSpinner(true);
     this.do_scroll = true;
+
+    // select model
+    if ((this.selectedModel === undefined) || (this.selectedModel === "")) {
+      let r: number = Math.floor(Math.random() * this.model_array.length);
+      this.selectedModel = this.model_array[r].name;
+    }
+    if (this.selectedModel !== this.previousModel) {
+      if (this.previousModel != "") {
+        this.ollamaService.UnloadModel(this.previousModel);
+      }
+      this.previousModel = this.selectedModel;
+    }
+
     this.username = this.utilService.GetUsername();
     if (this.previousSelectedPersona === "" || this.previousSelectedPersona === undefined) {
       this.previousSelectedPersona = this.selectedPersona;
@@ -271,14 +286,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       this.chatLinesUntilMemories = this.buildNewMemoriesAfter;
       this.memoryService.GenerateMemories(this.csrfToken ?? "");
     }
-    // TOFIX
-    // if( this.lastRelatedMemory === undefined) {
-    //   let relatedMemories = await this.memoryService.GetRelatedMemory(this.csrfToken ?? "", input);
-    //   if (relatedMemories !== "") {
-    //     this.lastRelatedMemory = relatedMemories;
-    //     this.chatLinesUntilNextContext = 1
-    //   }
-    // }
+
     if (this.chatLinesUntilNextContext < 0) {
       this.chatLinesUntilNextContext = this.renewContextAfter;
       this.SetContext("THIS IS A REMINDER!")
@@ -297,16 +305,6 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     this.chatLinesUntilMemories -= 1;
     this.localStorage.setItem('chat_history', JSON.stringify(this.chat_history));
 
-    if ((this.selectedModel === undefined) || (this.selectedModel === "")) {
-      let r: number = Math.floor(Math.random() * this.model_array.length);
-      this.selectedModel = this.model_array[r].name;
-    }
-    if (this.selectedModel !== this.previousModel) {
-      if (this.previousModel != "") {
-        this.ollamaService.UnloadModel(this.previousModel);
-      }
-      this.previousModel = this.selectedModel;
-    }
     this.localStorage.setItem("currentModel", this.selectedModel);
     this.model = this.GetModel();
     if(this.selectedModel === undefined|| this.selectedModel === "") {
