@@ -80,7 +80,8 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   previousUsername: string = "";
 
   ttsClip: string = "";
-
+  autonomousChat:boolean = false;
+  chatLinesUntilNextAutonomousChat: number = -1;
   chatLinesUntilNextContext: number = -1;
   chatLinesUntilMemories: number = -1;
   renewContextAfter: number = 15;
@@ -89,7 +90,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
   DefaultContext: string = "";
   DefaultPersona: string = "Beezle"
-  DefaultModel: string = "gemma2:2b";
+  DefaultModel: string = "llama3.2:3b-100k";
 
   selectedModel: string = "None";
   previousModel: string = this.selectedModel;
@@ -151,6 +152,11 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   model_array: Array<Model> = new Array<Model>();
 
   private showSpinner(onoff: boolean) {
+    if (this.autonomousChat === true ) {
+      this.spinnerState = false;
+      return;
+    }
+
     this.spinnerState = onoff;
     if (!onoff) {
       // @ts-ignore
@@ -172,7 +178,6 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     if ((this.localStorage.getItem("currentModel") !== undefined) &&
       (this.localStorage.getItem("currentModel") !== "") &&
       (this.CheckModelName(this.localStorage.getItem("currentModel") ?? "None"))) {
-      console.log("+++++++++++++++++++++  A");
       this.selectedModel = this.localStorage.getItem("currentModel") ?? "";
     }
     console.log("SELECTED MODEl : '"+this.selectedModel+"'");
@@ -245,6 +250,20 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
     this.showSpinner(false);
   }
 
+  ToggleAutonomousChat(e:any):void {
+    this.autonomousChat = e.target.checked;
+    this.showSpinner(e.target.checked);
+    console.log(this.autonomousChat)
+    if( this.autonomousChat === true) {
+      this.StartAutonomousChat();
+    }
+  }
+
+  async StartAutonomousChat() {
+    await this.GetLLMAnswer( "The User exits. Another LLM enters the room. Please greet it and talk to it.");
+    //await this.ollamaService.Talkback()
+  }
+
   async KeyUp(e: KeyboardEvent) {
     // console.log(this.user_input)
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -307,8 +326,8 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
     this.localStorage.setItem("currentModel", this.selectedModel);
     this.model = this.GetModel();
-    if(this.selectedModel === undefined|| this.selectedModel === "") {
-      this.selectedModel = this.model?.name??this.DefaultModel;
+    if(this.selectedModel === undefined || this.selectedModel === "") {
+      this.selectedModel = this.DefaultModel;
     }
     let postData: Prompt = {
       "model": this.selectedModel,
@@ -318,7 +337,7 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
       "keep_alive": -1
     };
     this.user_input = "";
-    this.answer = await this.ollamaService.sendRequest(this.csrfToken??"", postData) ?? "Something went wrong.";
+    this.answer = await this.ollamaService.sendRequest(this.csrfToken??"", postData, false) ?? "Something went wrong.";
     console.log("Answer received!")
     let cmd = await this.utilService.LookForCommands(this.answer)
     console.log("Command found : ",cmd)

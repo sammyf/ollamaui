@@ -61,7 +61,12 @@ export class OllamaService {
   //
   // Prompting Ollama must be done via a queue, to avoid CloudFlare timeouts (returncode 524)
   //
-  async sendRequest(csrfToken: string, postData:Prompt): Promise<string | undefined> {
+  async sendRequest(csrfToken: string, postData:Prompt, talkback:boolean=false): Promise<string | undefined> {
+    let endpoint = "chat";
+    if(talkback) {
+      endpoint = "talkback";
+    }
+
     try {
       const headers = new HttpHeaders({
         'content-type': 'application/json',
@@ -70,7 +75,7 @@ export class OllamaService {
       });
       const requestId: {uniqueID:string} = await lastValueFrom(
         this.http.post<{uniqueID:string}>(
-          `${environment.companionUrl}/async/chat?cache=${Math.floor(Math.random() * 10000000)}`,
+          `${environment.companionUrl}/async/${endpoint}?cache=${Math.floor(Math.random() * 10000000)}`,
           postData,
           {
             responseType: 'json',
