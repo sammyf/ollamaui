@@ -45,6 +45,10 @@ const routes: Routes = [
   }
   ];
 
+const Embedders: Array<string> = [
+  "nomic-embed-text:latest"
+]
+
 @Injectable({providedIn: 'root'})
 @Component({
   selector: 'input_box',
@@ -92,10 +96,10 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
   DefaultPersona: string = "Beezle"
   DefaultModel: string = "llama3.2:3b-100k";
 
-  selectedModel: string = "None";
+  selectedModel: string = "";
   previousModel: string = this.selectedModel;
   model: Model | undefined = undefined;
-  selectedPersona: string = this.DefaultModel;
+  selectedPersona: string = "";
   spinnerState: boolean = true;
 
   previousSelectedPersona: string = "";
@@ -277,8 +281,9 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
     // select model
     if ((this.selectedModel === undefined) || (this.selectedModel === "")) {
-      let r: number = Math.floor(Math.random() * this.model_array.length);
-      this.selectedModel = this.model_array[r].name;
+      // let r: number = Math.floor(Math.random() * this.model_array.length);
+      // this.selectedModel = this.model_array[r].name;
+      this.selectedModel=this.DefaultModel
     }
     if (this.selectedModel !== this.previousModel) {
       if (this.previousModel != "") {
@@ -326,9 +331,10 @@ export class InputBoxComponent implements AfterViewChecked, OnInit {
 
     this.localStorage.setItem("currentModel", this.selectedModel);
     this.model = this.GetModel();
-    if(this.selectedModel === undefined || this.selectedModel === "") {
+    if(this.selectedModel === undefined || this.selectedModel === "" || (this.selectedModel in Embedders)) {
       this.selectedModel = this.DefaultModel;
     }
+    console.log("Selected model : ", this.selectedModel);
     let postData: Prompt = {
       "model": this.selectedModel,
       "stream": false,
